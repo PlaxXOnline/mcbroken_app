@@ -13,19 +13,28 @@ class HomeScreen extends StatelessWidget {
         title: const Text('McBroken'),
         centerTitle: true,
       ),
-      body: BlocBuilder<InternetCubit, InternetState>(
-        builder: (blocContext, state) {
-          if (state is InternetConnected &&
-              state.connectionType == ConnectionType.Wifi) {
-            return const Placeholder();
-          } else if (state is InternetConnected &&
-              state.connectionType == ConnectionType.Mobile) {
-            return const Placeholder();
-          } else if (state is InternetDisconnected) {
-            return const Text('Keine Internetverbindung.');
-          }
-          return const CircularProgressIndicator();
-        },
+      body: Center(
+        child: Column(
+          children: [
+            BlocBuilder<InternetCubit, InternetState>(
+              builder: (blocContext, state) {
+                if (state is InternetConnected &&
+                    state.connectionType == ConnectionType.Wifi) {
+                  return const Text('Connection: Wifi');
+                } else if (state is InternetConnected &&
+                    state.connectionType == ConnectionType.Mobile) {
+                  return const Text('Connection: Mobile');
+                } else if (state is InternetDisconnected) {
+                  return const Text('Keine Internetverbindung.');
+                }
+                return const CircularProgressIndicator();
+              },
+            ),
+            /* Divider(
+              height: 5,
+            ), */
+          ],
+        ),
       ),
     );
   }
