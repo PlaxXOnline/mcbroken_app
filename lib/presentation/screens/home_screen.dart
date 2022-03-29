@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:mcbroken/constants/enums.dart';
+import 'package:mcbroken/logic/cubit/internet_cubit.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -10,7 +13,20 @@ class HomeScreen extends StatelessWidget {
         title: const Text('McBroken'),
         centerTitle: true,
       ),
-      body: ,
+      body: BlocBuilder<InternetCubit, InternetState>(
+        builder: (blocContext, state) {
+          if (state is InternetConnected &&
+              state.connectionType == ConnectionType.Wifi) {
+            return const Placeholder();
+          } else if (state is InternetConnected &&
+              state.connectionType == ConnectionType.Mobile) {
+            return const Placeholder();
+          } else if (state is InternetDisconnected) {
+            return const Text('Keine Internetverbindung.');
+          }
+          return const CircularProgressIndicator();
+        },
+      ),
     );
   }
 }
