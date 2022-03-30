@@ -29,6 +29,10 @@ class HomeScreen extends StatelessWidget {
                         return McDonaldsMap(
                           mcdonalds_data: homeBloc.mcdonalds_data,
                         );
+                      } else if (homeBloc is HomeStateError) {
+                        return Center(
+                          child: Text(homeBloc.error),
+                        );
                       } else {
                         return const Center(
                           child: CircularProgressIndicator(),
