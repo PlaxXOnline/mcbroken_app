@@ -21,15 +21,14 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final InternetCubit internetCubit =
+        InternetCubit(connectivity: connectivity);
     return MultiBlocProvider(
       providers: [
-        BlocProvider<InternetCubit>(
-          create: (internetcontext) =>
-              InternetCubit(connectivity: connectivity),
-        ),
+        BlocProvider.value(value: internetCubit),
         BlocProvider<HomeBloc>(
           create: (context) => HomeBloc(
-            internetCubit: context.read<InternetCubit>(),
+            internetCubit: internetCubit,
           ),
         ),
       ],

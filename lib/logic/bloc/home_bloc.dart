@@ -19,11 +19,14 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       BlocListener<InternetCubit, InternetState>(
         listener: (context, state) async {
           if (state is InternetConnected) {
+            print('Internet connected');
             final List<Mcdonalds_model> mcdonaldsData =
                 await mcDonaldsRepository.getDatafromMcDonalds();
             emit(HomeStateLoaded(mcdonaldsData));
           } else if (state is InternetDisconnected) {
             emit(HomeStateError('No internet connection'));
+          } else {
+            emit(HomeStateError('Unknown error'));
           }
         },
       );
