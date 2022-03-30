@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mcbroken/constants/enums.dart';
+import 'package:mcbroken/logic/bloc/home_bloc.dart';
 import 'package:mcbroken/logic/cubit/internet_cubit.dart';
+import 'package:mcbroken/presentation/widgets/map.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -20,7 +22,20 @@ class HomeScreen extends StatelessWidget {
               builder: (blocContext, state) {
                 if (state is InternetConnected &&
                     state.connectionType == ConnectionType.Wifi) {
-                  return const Text('Connection: Wifi');
+                  return Flexible(
+                    child: Builder(builder: ((context) {
+                      final homeBloc = context.watch<HomeBloc>().state;
+                      if (homeBloc is HomeStateLoaded) {
+                        return McDonaldsMap(
+                          mcdonalds_data: homeBloc.mcdonalds_data,
+                        );
+                      } else {
+                        return const Center(
+                          child: CircularProgressIndicator(),
+                        );
+                      }
+                    })),
+                  );
                 } else if (state is InternetConnected &&
                     state.connectionType == ConnectionType.Mobile) {
                   return const Text('Connection: Mobile');

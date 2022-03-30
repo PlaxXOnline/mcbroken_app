@@ -1,6 +1,7 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:mcbroken/logic/bloc/home_bloc.dart';
 import 'package:mcbroken/logic/cubit/internet_cubit.dart';
 import 'package:mcbroken/presentation/screens/home_screen.dart';
 
@@ -23,7 +24,13 @@ class MyApp extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider<InternetCubit>(
-          create: (context) => InternetCubit(connectivity: connectivity),
+          create: (internetcontext) =>
+              InternetCubit(connectivity: connectivity),
+        ),
+        BlocProvider<HomeBloc>(
+          create: (context) => HomeBloc(
+            internetCubit: context.read<InternetCubit>(),
+          ),
         ),
       ],
       child: MaterialApp(
