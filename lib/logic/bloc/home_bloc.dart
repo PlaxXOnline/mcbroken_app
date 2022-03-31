@@ -12,29 +12,37 @@ part 'home_state.dart';
 class HomeBloc extends Bloc<HomeEvent, HomeState> {
   final InternetCubit? internetCubit;
   final McDonaldsRepository mcDonaldsRepository = McDonaldsRepository();
+  late StreamSubscription? internetStreamSubscription;
 
-  HomeBloc({required this.internetCubit}) : super(HomeStateInitial()) {
+  HomeBloc({this.internetCubit}) : super(HomeStateInitial()) {
+    print("TEST");
+    /*internetStreamSubscription = internetCubit?.stream.listen(
+      (state) async {
+        print('Internet connected');
+
+        if (state is InternetConnected) {
+          final List<Mcdonalds_model> mcdonaldsData =
+              await mcDonaldsRepository.getDatafromMcDonalds();
+          emit(HomeStateLoaded(mcdonaldsData));
+        } else if (state is InternetDisconnected) {
+          emit(HomeStateError('No internet connection'));
+        } else {
+          emit(HomeStateError('Unknown error'));
+        }
+      },
+    );*/
+    //internetCubit?.monitorInternetConnection();
+
     on<DataRequestEvent>((event, emit) async {
       emit(HomeStateLoading());
-      BlocListener<InternetCubit, InternetState>(
-        listener: (context, state) async {
-          if (state is InternetConnected) {
-            print('Internet connected');
-            final List<Mcdonalds_model> mcdonaldsData =
-                await mcDonaldsRepository.getDatafromMcDonalds();
-            emit(HomeStateLoaded(mcdonaldsData));
-          } else if (state is InternetDisconnected) {
-            emit(HomeStateError('No internet connection'));
-          } else {
-            emit(HomeStateError('Unknown error'));
-          }
-        },
-      );
+      final List<Mcdonalds_model> mcdonaldsData =
+          await mcDonaldsRepository.getDatafromMcDonalds();
+      emit(HomeStateLoaded(mcdonaldsData));
     });
-
-    @override
-    Future<void> close() {
-      return super.close();
-    }
+  }
+  @override
+  Future<void> close() {
+    internetStreamSubscription?.cancel();
+    return super.close();
   }
 }

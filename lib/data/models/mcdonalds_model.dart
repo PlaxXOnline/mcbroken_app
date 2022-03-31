@@ -65,7 +65,7 @@ class Mcdonalds_model {
 }
 
 class Geometry {
-  final List<String> coordinates;
+  final List<dynamic> coordinates;
   final String type;
   Geometry({
     required this.coordinates,
@@ -73,7 +73,7 @@ class Geometry {
   });
 
   Geometry copyWith({
-    List<String>? coordinates,
+    List<dynamic>? coordinates,
     String? type,
   }) {
     return Geometry(
@@ -93,7 +93,7 @@ class Geometry {
 
   factory Geometry.fromMap(Map<String, dynamic> map) {
     return Geometry(
-      coordinates: List<String>.from(map['coordinates']),
+      coordinates: List<dynamic>.from(map['coordinates']),
       type: map['type'] ?? '',
     );
   }

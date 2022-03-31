@@ -16,8 +16,8 @@ class McDonaldsMap extends StatelessWidget {
           width: 80.0,
           height: 80.0,
           point: LatLng(
-            double.parse(mcdonalds_data[i].geometry.coordinates[0]),
             double.parse(mcdonalds_data[i].geometry.coordinates[1]),
+            double.parse(mcdonalds_data[i].geometry.coordinates[0]),
           ),
           builder: (ctx) => Container(
             child: IconButton(
@@ -32,7 +32,7 @@ class McDonaldsMap extends StatelessWidget {
 
     return FlutterMap(
       options: MapOptions(
-        center: LatLng(51.5, -0.09),
+        center: LatLng(48.7783, 9.1796),
         zoom: 15.0,
       ),
       layers: [

@@ -1,10 +1,10 @@
 import 'package:http/http.dart' as http;
 
 class McDonaldsDataProvider {
-  var url = Uri.parse(
-      'https://raw.githubusercontent.com/rashiq/mcbroken-archive/main/mcbroken.json');
+  var url = Uri.parse('http://192.168.64.2/mcbroken.json');
   Future fetchData() async {
-    final rawData = await http.get(url);
-    return rawData;
+    var client = http.Client();
+    final rawData = await client.get(url);
+    return rawData.body;
   }
 }

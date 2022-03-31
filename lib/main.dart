@@ -27,9 +27,7 @@ class MyApp extends StatelessWidget {
       providers: [
         BlocProvider.value(value: internetCubit),
         BlocProvider<HomeBloc>(
-          create: (context) => HomeBloc(
-            internetCubit: internetCubit,
-          ),
+          create: (context) => HomeBloc(),
         ),
       ],
       child: MaterialApp(

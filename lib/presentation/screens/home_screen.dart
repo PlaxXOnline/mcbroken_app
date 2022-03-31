@@ -18,10 +18,13 @@ class HomeScreen extends StatelessWidget {
       body: Center(
         child: Column(
           children: [
-            BlocBuilder<InternetCubit, InternetState>(
-              builder: (blocContext, state) {
+            Builder(
+              builder: (blocContext) {
+                var state = context.watch<InternetCubit>().state;
+                print(state);
                 if (state is InternetConnected &&
                     state.connectionType == ConnectionType.Wifi) {
+                  context.read<HomeBloc>().add(DataRequestEvent());
                   return Flexible(
                     child: Builder(builder: ((context) {
                       final homeBloc = context.watch<HomeBloc>().state;
