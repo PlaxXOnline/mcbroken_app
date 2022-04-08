@@ -12,6 +12,18 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.search_rounded),
+            onPressed: () {
+              print('such was');
+              //BlocProvider.of<HomeBloc>(context).add(DataRequestEvent());
+            },
+          ),
+        ],
+        leading: Image.asset(
+          'assets/flurry_icon.ico',
+        ),
         title: const Text('McBroken'),
         centerTitle: true,
       ),

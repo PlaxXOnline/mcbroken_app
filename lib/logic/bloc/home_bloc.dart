@@ -15,23 +15,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   late StreamSubscription? internetStreamSubscription;
 
   HomeBloc({this.internetCubit}) : super(HomeStateInitial()) {
-    print("TEST");
-    /*internetStreamSubscription = internetCubit?.stream.listen(
-      (state) async {
-        print('Internet connected');
-
-        if (state is InternetConnected) {
-          final List<Mcdonalds_model> mcdonaldsData =
-              await mcDonaldsRepository.getDatafromMcDonalds();
-          emit(HomeStateLoaded(mcdonaldsData));
-        } else if (state is InternetDisconnected) {
-          emit(HomeStateError('No internet connection'));
-        } else {
-          emit(HomeStateError('Unknown error'));
-        }
-      },
-    );*/
-    //internetCubit?.monitorInternetConnection();
+    print("HomeState initializing...");
 
     on<DataRequestEvent>((event, emit) async {
       emit(HomeStateLoading());
