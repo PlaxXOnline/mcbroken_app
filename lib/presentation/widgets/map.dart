@@ -27,7 +27,6 @@ class McDonaldsMap extends StatelessWidget {
                   : Colors.red,
               icon: const Icon(Icons.location_on),
               onPressed: () {
-                //print('Marker tapped');
                 mcDonaldsDetailSheet(context, i);
               },
             ),
@@ -40,16 +39,22 @@ class McDonaldsMap extends StatelessWidget {
         center: LatLng(48.7783, 9.1796),
         zoom: 15.0,
       ),
-      layers: [
-        TileLayerOptions(
-          urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-          subdomains: ['a', 'b', 'c'],
-          // For example purposes. It is recommended to use
-          // TileProvider with a caching and retry strategy, like
-          // NetworkTileProvider or CachedNetworkTileProvider
-          tileProvider: NetworkTileProvider(),
+      children: [
+        TileLayerWidget(
+          options: TileLayerOptions(
+            urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+            subdomains: ['a', 'b', 'c'],
+            // For example purposes. It is recommended to use
+            // TileProvider with a caching and retry strategy, like
+            // NetworkTileProvider or CachedNetworkTileProvider
+            tileProvider: NetworkTileProvider(),
+          ),
         ),
-        MarkerLayerOptions(markers: markers)
+        MarkerLayerWidget(
+          options: MarkerLayerOptions(
+            markers: markers,
+          ),
+        ),
       ],
     );
   }
