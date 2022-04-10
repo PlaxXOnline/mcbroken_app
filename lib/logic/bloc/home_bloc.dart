@@ -13,15 +13,15 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   final InternetCubit? internetCubit;
   final McDonaldsRepository mcDonaldsRepository = McDonaldsRepository();
   late StreamSubscription? internetStreamSubscription;
+  late final List<Mcdonalds_model> mcDonaldsData;
 
   HomeBloc({this.internetCubit}) : super(HomeStateInitial()) {
     print("HomeState initializing...");
 
     on<DataRequestEvent>((event, emit) async {
       emit(HomeStateLoading());
-      final List<Mcdonalds_model> mcdonaldsData =
-          await mcDonaldsRepository.getDatafromMcDonalds();
-      emit(HomeStateLoaded(mcdonaldsData));
+      mcDonaldsData = await mcDonaldsRepository.getDatafromMcDonalds();
+      emit(HomeStateLoaded(mcDonaldsData));
       print('HomeState Loaded');
     });
   }

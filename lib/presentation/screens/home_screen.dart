@@ -32,24 +32,24 @@ class HomeScreen extends StatelessWidget {
           children: [
             Builder(
               builder: (blocContext) {
-                var state = context.watch<InternetCubit>().state;
-                print(state);
-                if (state is InternetConnected &&
-                        state.connectionType == ConnectionType.Wifi ||
-                    state is InternetConnected &&
-                        state.connectionType == ConnectionType.Mobile) {
+                var internetState = context.watch<InternetCubit>().state;
+                print(internetState);
+                if (internetState is InternetConnected &&
+                        internetState.connectionType == ConnectionType.Wifi ||
+                    internetState is InternetConnected &&
+                        internetState.connectionType == ConnectionType.Mobile) {
                   context.read<HomeBloc>().add(DataRequestEvent());
                   return Flexible(
                     child: Builder(
                       builder: ((context) {
-                        final homeBloc = context.watch<HomeBloc>().state;
-                        if (homeBloc is HomeStateLoaded) {
+                        final homeState = context.watch<HomeBloc>().state;
+                        if (homeState is HomeStateLoaded) {
                           return McDonaldsMap(
-                            mcdonalds_data: homeBloc.mcdonalds_data,
-                          );
-                        } else if (homeBloc is HomeStateError) {
+                              /* mcdonalds_data: homeState.mcdonalds_data, */
+                              );
+                        } else if (homeState is HomeStateError) {
                           return Center(
-                            child: Text(homeBloc.error),
+                            child: Text(homeState.error),
                           );
                         } else {
                           return const Center(
@@ -59,7 +59,7 @@ class HomeScreen extends StatelessWidget {
                       }),
                     ),
                   );
-                } else if (state is InternetDisconnected) {
+                } else if (internetState is InternetDisconnected) {
                   return const Text('Keine Internetverbindung.');
                 }
                 return const Center(child: CircularProgressIndicator());
