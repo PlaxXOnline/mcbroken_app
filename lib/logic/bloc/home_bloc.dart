@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_map/flutter_map.dart';
 import 'package:mcbroken/data/models/mcdonalds_model.dart';
 import 'package:mcbroken/data/repository/mcdonalds_repository.dart';
 import 'package:mcbroken/logic/cubit/internet_cubit.dart';

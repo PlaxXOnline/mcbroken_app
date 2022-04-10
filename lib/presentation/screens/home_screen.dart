@@ -35,33 +35,34 @@ class HomeScreen extends StatelessWidget {
                 var state = context.watch<InternetCubit>().state;
                 print(state);
                 if (state is InternetConnected &&
-                    state.connectionType == ConnectionType.Wifi) {
+                        state.connectionType == ConnectionType.Wifi ||
+                    state is InternetConnected &&
+                        state.connectionType == ConnectionType.Mobile) {
                   context.read<HomeBloc>().add(DataRequestEvent());
                   return Flexible(
-                    child: Builder(builder: ((context) {
-                      final homeBloc = context.watch<HomeBloc>().state;
-                      if (homeBloc is HomeStateLoaded) {
-                        return McDonaldsMap(
-                          mcdonalds_data: homeBloc.mcdonalds_data,
-                        );
-                      } else if (homeBloc is HomeStateError) {
-                        return Center(
-                          child: Text(homeBloc.error),
-                        );
-                      } else {
-                        return const Center(
-                          child: CircularProgressIndicator(),
-                        );
-                      }
-                    })),
+                    child: Builder(
+                      builder: ((context) {
+                        final homeBloc = context.watch<HomeBloc>().state;
+                        if (homeBloc is HomeStateLoaded) {
+                          return McDonaldsMap(
+                            mcdonalds_data: homeBloc.mcdonalds_data,
+                          );
+                        } else if (homeBloc is HomeStateError) {
+                          return Center(
+                            child: Text(homeBloc.error),
+                          );
+                        } else {
+                          return const Center(
+                            child: CircularProgressIndicator(),
+                          );
+                        }
+                      }),
+                    ),
                   );
-                } else if (state is InternetConnected &&
-                    state.connectionType == ConnectionType.Mobile) {
-                  return const Text('Connection: Mobile');
                 } else if (state is InternetDisconnected) {
                   return const Text('Keine Internetverbindung.');
                 }
-                return const CircularProgressIndicator();
+                return const Center(child: CircularProgressIndicator());
               },
             ),
             /* Divider(
