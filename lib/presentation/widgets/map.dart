@@ -65,6 +65,8 @@ class _McDonaldsMapState extends State<McDonaldsMap> {
       options: MapOptions(
         center: LatLng(48.7783, 9.1796),
         zoom: 15.0,
+        minZoom: 5.0,
+        maxZoom: 25.0,
         plugins: [
           MarkerClusterPlugin(),
         ],
@@ -94,9 +96,10 @@ class _McDonaldsMapState extends State<McDonaldsMap> {
                 color: Colors.black12,
                 borderStrokeWidth: 3),
             popupOptions: PopupOptions(
-              popupSnap: PopupSnap.markerTop,
-              popupController: popupController,
-              popupBuilder: (_, marker) => Container(
+                popupSnap: PopupSnap.markerTop,
+                popupController: popupController,
+                popupBuilder: (_, marker) =>
+                    const Placeholder() /* Container(
                 width: 200,
                 height: 100,
                 color: Colors.white,
@@ -175,8 +178,8 @@ class _McDonaldsMapState extends State<McDonaldsMap> {
                       ),
                     ),
                   ),
-                  ),),
-                ),,
+                  ),), */
+                ),
             builder: (context, markers) {
               return Container(
                 decoration: BoxDecoration(
@@ -191,9 +194,9 @@ class _McDonaldsMapState extends State<McDonaldsMap> {
               ); /* FloatingActionButton(
                   child: Text(markers.length.toString()), onPressed: () {}); */
             },
+          ),
         ),
-    ),
-          /* MarkerLayerOptions(
+        /* MarkerLayerOptions(
             markers: markers,
           ), */
       ],
