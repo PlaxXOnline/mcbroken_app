@@ -114,10 +114,76 @@ class _McDonaldsMapState extends State<McDonaldsMap> {
                       child: GestureDetector(
                         child: Padding(
                           padding: const EdgeInsets.only(
-                              top: 20.0, left: 20.0, right: 20.0),
-                          child: Row(
+                              top: 10.0, left: 10.0, right: 10.0),
+                          child: Column(
                             children: [
-                              Image.asset('assets/flurry_big_transparent.png'),
+                              SizedBox(
+                                height: 100,
+                                width: 100,
+                                child: Image.asset(
+                                    'assets/flurry_big_transparent.png'),
+                              ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  const Text(
+                                    'McDonalds ',
+                                    style: TextStyle(
+                                      fontSize: 15.0,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  Text(
+                                    facilityMarker.city,
+                                    style: const TextStyle(
+                                      fontSize: 15.0,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(
+                                height: 5,
+                              ),
+                              Text(
+                                facilityMarker.street,
+                                style: const TextStyle(
+                                  fontSize: 15.0,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              const SizedBox(
+                                height: 20,
+                              ),
+                              Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  const Text(
+                                    'Eismaschine: ',
+                                    style: TextStyle(
+                                      fontSize: 15.0,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  Text(
+                                    facilityMarker.dot == 'working'
+                                        ? 'Funktioniert'
+                                        : 'Defekt',
+                                    style: const TextStyle(
+                                      fontSize: 15.0,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  Icon(
+                                    facilityMarker.dot == 'working'
+                                        ? Icons.check_circle
+                                        : Icons.cancel,
+                                    color: facilityMarker.dot == 'working'
+                                        ? Colors.green
+                                        : Colors.red,
+                                  ),
+                                ],
+                              ),
                             ],
                           ),
                         ),
