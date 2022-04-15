@@ -14,6 +14,7 @@ class McDonaldsMap extends StatefulWidget {
 class _McDonaldsMapState extends State<McDonaldsMap> {
   List<Mcdonalds_model> mcdonalds_data = <Mcdonalds_model>[];
   final PopupController popupController = PopupController();
+  late final Mcdonalds_model data;
 
   @override
   void initState() {
@@ -27,16 +28,20 @@ class _McDonaldsMapState extends State<McDonaldsMap> {
 
   @override
   Widget build(BuildContext context) {
+    final Size size = MediaQuery.of(context).size;
     mcdonalds_data = BlocProvider.of<HomeBloc>(context).mcDonaldsData;
-    var markers = <Marker>[
+    var markers = <FacilityMarker>[
       for (int i = 0, len = mcdonalds_data.length; i < len; i++)
-        Marker(
+        FacilityMarker(
           width: 80.0,
           height: 80.0,
           point: LatLng(
             double.parse(mcdonalds_data[i].geometry.coordinates[1]),
             double.parse(mcdonalds_data[i].geometry.coordinates[0]),
           ),
+          city: mcdonalds_data[i].properties.city,
+          street: mcdonalds_data[i].properties.street,
+          dot: mcdonalds_data[i].properties.dot,
           builder: (ctx) => SizedBox(
             height: 75,
             width: 75,
@@ -98,88 +103,28 @@ class _McDonaldsMapState extends State<McDonaldsMap> {
             popupOptions: PopupOptions(
                 popupSnap: PopupSnap.markerTop,
                 popupController: popupController,
-                popupBuilder: (_, marker) =>
-                    const Placeholder() /* Container(
-                width: 200,
-                height: 100,
-                color: Colors.white,
-                child: GestureDetector(
-                  onTap: () => debugPrint('Popup tap!'),
-                  child: SizedBox(
-                    child: Padding(
-                      padding:
-                          const EdgeInsets.only(top: 20.0, left: 20.0, right: 20.0),
-                      child: Column(
-                        children: [
-                          Image.asset('assets/flurry_big_transparent.png'),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
+                popupBuilder: (_, marker) {
+                  final facilityMarker = marker as FacilityMarker;
+                  return ClipRRect(
+                    borderRadius: BorderRadius.circular(10),
+                    child: Container(
+                      width: size.width * 0.6,
+                      height: size.height * 0.3,
+                      color: Colors.white,
+                      child: GestureDetector(
+                        child: Padding(
+                          padding: const EdgeInsets.only(
+                              top: 20.0, left: 20.0, right: 20.0),
+                          child: Row(
                             children: [
-                              const Text(
-                                'McDonalds ',
-                                style: TextStyle(
-                                  fontSize: 20.0,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              Text(
-                                mcdonalds_data[].properties.city,
-                                style: const TextStyle(
-                                  fontSize: 20.0,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
+                              Image.asset('assets/flurry_big_transparent.png'),
                             ],
                           ),
-                          const SizedBox(
-                            height: 10,
-                          ),
-                          Text(
-                            mcdonalds_data[index].properties.street,
-                            style: const TextStyle(
-                              fontSize: 15.0,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(
-                            height: 70,
-                          ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              const Text(
-                                'Eismaschine: ',
-                                style: TextStyle(
-                                  fontSize: 20.0,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              Text(
-                                mcdonalds_data[index].properties.dot == 'working'
-                                    ? 'Funktioniert'
-                                    : 'Defekt',
-                                style: const TextStyle(
-                                  fontSize: 20.0,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              Icon(
-                                mcdonalds_data[index].properties.dot == 'working'
-                                    ? Icons.check_circle
-                                    : Icons.cancel,
-                                color:
-                                    mcdonalds_data[index].properties.dot == 'working'
-                                        ? Colors.green
-                                        : Colors.red,
-                              ),
-                            ],
-                          ),
-                        ],
+                        ),
                       ),
                     ),
-                  ),
-                  ),), */
-                ),
+                  );
+                }),
             builder: (context, markers) {
               return Container(
                 decoration: BoxDecoration(
@@ -292,4 +237,27 @@ class _McDonaldsMapState extends State<McDonaldsMap> {
       },
     );
   }
+}
+
+class FacilityMarker extends Marker {
+  //final String name;
+  final String street;
+  final String dot;
+  final String city;
+
+  FacilityMarker({
+    required LatLng point,
+    required WidgetBuilder builder,
+    double width = 80.0,
+    double height = 80.0,
+    //required this.name,
+    required this.street,
+    required this.dot,
+    required this.city,
+  }) : super(
+          point: point,
+          builder: builder,
+          width: width,
+          height: height,
+        );
 }
