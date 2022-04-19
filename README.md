@@ -1,7 +1,7 @@
 <h1 align="center">
   <a href="https://github.com/PlaxXOnline/mcbroken">
     <!-- Please provide path to your logo here -->
-    <img src="docs/images/logo.svg" alt="Logo" width="100" height="100">
+    <img src="assets/flurry_big_transparent.png" alt="Logo" width="100" height="100">
   </a>
 </h1>
 
@@ -126,7 +126,6 @@ Together, we can make mcbroken **better**!
 ## Contributing
 
 First off, thanks for taking the time to contribute! Contributions are what make the open-source community such an amazing place to learn, inspire, and create. Any contributions you make will benefit everybody else and are **greatly appreciated**.
-
 
 Please read [our contribution guidelines](docs/CONTRIBUTING.md), and thank you for being involved!
 
