@@ -207,9 +207,6 @@ class _McDonaldsMapState extends State<McDonaldsMap> {
             },
           ),
         ),
-        /* MarkerLayerOptions(
-            markers: markers,
-          ), */
       ],
     );
   }
