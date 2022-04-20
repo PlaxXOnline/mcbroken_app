@@ -12,7 +12,7 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        actions: [
+        /* actions: [
           IconButton(
             icon: const Icon(Icons.search_rounded),
             onPressed: () {
@@ -20,7 +20,7 @@ class HomeScreen extends StatelessWidget {
               //BlocProvider.of<HomeBloc>(context).add(DataRequestEvent());
             },
           ),
-        ],
+        ], */
         leading: Image.asset(
           'assets/flurry_icon.ico',
         ),
@@ -44,9 +44,7 @@ class HomeScreen extends StatelessWidget {
                       builder: ((context) {
                         final homeState = context.watch<HomeBloc>().state;
                         if (homeState is HomeStateLoaded) {
-                          return McDonaldsMap(
-                              /* mcdonalds_data: homeState.mcdonalds_data, */
-                              );
+                          return McDonaldsMap();
                         } else if (homeState is HomeStateError) {
                           return Center(
                             child: Text(homeState.error),
