@@ -1,5 +1,5 @@
 <h1 align="center">
-  <a href="https://github.com/PlaxXOnline/mcbroken_app_app">
+  <a href="https://github.com/PlaxXOnline/mcbroken_app">
     <img src="assets/flurry_big_transparent.png" alt="Logo" width="100" height="100">
   </a>
 </h1>
