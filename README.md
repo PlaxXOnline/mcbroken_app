@@ -88,8 +88,7 @@
 
 ### Installation
 
-> **[?]**
-> First, download and install [Flutter](https://www.flutter.dev/).
+First, download and install [Flutter](https://www.flutter.dev/).
 
 ## Usage
 
@@ -131,6 +130,7 @@ Please read [our contribution guidelines](CONTRIBUTING.md), and thank you for be
 ## Authors & contributors
 
 The original setup of this repository is by [Janik Kahle](https://github.com/PlaxXOnline).
+The mcbroken API is by [Rashiq](https://github.com/rashiq).
 
 For a full list of all authors and contributors, see [the contributors page](https://github.com/PlaxXOnline/mcbroken_app/contributors).
 
