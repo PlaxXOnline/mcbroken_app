@@ -58,6 +58,16 @@
 > Why did you undertake it?
 > You don't have to answer all the questions -- just the ones relevant to your project.
 
+Haven't you ever driven to a McDonalds on a hot summer day with a craving for ice cream? Or a McFlurry?
+
+Yes?
+
+Then one or the other of these trips was probably completely wasted because the ice cream machine was broken, right?
+
+With this app, that's guaranteed not to happen again.
+With the brilliant idea of [Rashiq](https://github.com/rashiq) to develop an API that programmatically checks if the ice machine of McDonalds is working, all these unnecessary empty trips are passeé.
+Rashiq only had a website available at the time of development, so I thought I'd give this project a cross platform app.
+
 <details>
 <summary>Screenshots</summary>
 <br>
@@ -79,6 +89,8 @@
 > **[?]**
 > Please provide the technologies that are used in the project.
 
+This Application was build with Flutter.
+
 ## Getting Started
 
 ### Prerequisites
@@ -92,7 +104,7 @@ First, download and install [Flutter](https://www.flutter.dev/).
 
 ## Usage
 
-If everything is successfully installed, you can just start your IDE and Simulator and press the debug button.
+If everything is successfully installed, you can just start your IDE and Simulator and press the run button.
 
 ## Roadmap
 
