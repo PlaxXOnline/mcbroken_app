@@ -63,11 +63,14 @@
 <br>
 
 > **[?]**
-> Please provide your screenshots here.
 
-|                               Home Page                               |                               Login Page                               |
+|                          Machine is working                           |                        Machine is not working                          |
 | :-------------------------------------------------------------------: | :--------------------------------------------------------------------: |
-| <img src="docs/images/screenshot.png" title="Home Page" width="100%"> | <img src="docs/images/screenshot.png" title="Login Page" width="100%"> |
+| <img src="docs/images/mcbroken_works.png" title="Machine is working" width="100%"> | <img src="docs/images/mcbroken_notworking.png" title="Machine is not working" width="100%"> |
+
+|                               Clustering                              |
+| :-------------------------------------------------------------------: |
+| <img src="docs/images/mcbroken_clustering.gif" title="mcbroken clustering" width="100%"> |
 
 </details>
 
@@ -86,13 +89,12 @@
 ### Installation
 
 > **[?]**
-> Describe how to install and get started with the project.
+> First, download and install [Flutter](https://www.flutter.dev/).
 
 ## Usage
 
 > **[?]**
-> How does one go about using it?
-> Provide various use cases and code examples here.
+> If everything is successfully installed, you can just start your IDE and Simulator and press the debug button.
 
 ## Roadmap
 
@@ -105,9 +107,7 @@ See the [open issues](https://github.com/PlaxXOnline/mcbroken_app/issues) for a 
 ## Support
 
 > **[?]**
-> Provide additional ways to contact the project maintainer/maintainers.
-
-Reach out to the maintainer at one of the following places:
+> Reach out to the maintainer at one of the following places:
 
 - [GitHub issues](https://github.com/PlaxXOnline/mcbroken_app/issues/new?assignees=&labels=question&template=04_SUPPORT_QUESTION.md&title=support%3A+)
 - Contact options listed on [this GitHub profile](https://github.com/PlaxXOnline)
@@ -126,7 +126,7 @@ Together, we can make mcbroken_app **better**!
 
 First off, thanks for taking the time to contribute! Contributions are what make the open-source community such an amazing place to learn, inspire, and create. Any contributions you make will benefit everybody else and are **greatly appreciated**.
 
-Please read [our contribution guidelines](docs/CONTRIBUTING.md), and thank you for being involved!
+Please read [our contribution guidelines](CONTRIBUTING.md), and thank you for being involved!
 
 ## Authors & contributors
 
@@ -139,7 +139,7 @@ For a full list of all authors and contributors, see [the contributors page](htt
 mcbroken_app follows good practices of security, but 100% security cannot be assured.
 mcbroken_app is provided **"as is"** without any **warranty**. Use at your own risk.
 
-_For more information and to report security issues, please refer to our [security documentation](docs/SECURITY.md)._
+_For more information and to report security issues, please refer to our [security documentation](SECURITY.md)._
 
 ## License
 
@@ -149,6 +149,4 @@ See [LICENSE](LICENSE) for more information.
 
 ## Acknowledgements
 
-> **[?]**
-> If your work was funded by any organization or institution, acknowledge their support here.
-> In addition, if your work relies on other software libraries, or was inspired by looking at other work, it is appropriate to acknowledge this intellectual debt too.
+A very special thanks goes to [Rashiq](https://github.com/rashiq), without his API and idea this would have been nowhere near as easy.
