@@ -92,10 +92,15 @@ First, download and install [Flutter](https://www.flutter.dev/).
 
 ## Usage
 
-> **[?]**
-> If everything is successfully installed, you can just start your IDE and Simulator and press the debug button.
+If everything is successfully installed, you can just start your IDE and Simulator and press the debug button.
 
 ## Roadmap
+
+- [x] Popups
+- [x] Clustering
+- [ ] Localizations
+- [ ] Search
+- [ ] Support more Countries
 
 See the [open issues](https://github.com/PlaxXOnline/mcbroken_app/issues) for a list of proposed features (and known issues).
 
@@ -104,9 +109,6 @@ See the [open issues](https://github.com/PlaxXOnline/mcbroken_app/issues) for a 
 - [Newest Bugs](https://github.com/PlaxXOnline/mcbroken_app/issues?q=is%3Aopen+is%3Aissue+label%3Abug)
 
 ## Support
-
-> **[?]**
-> Reach out to the maintainer at one of the following places:
 
 - [GitHub issues](https://github.com/PlaxXOnline/mcbroken_app/issues/new?assignees=&labels=question&template=04_SUPPORT_QUESTION.md&title=support%3A+)
 - Contact options listed on [this GitHub profile](https://github.com/PlaxXOnline)
@@ -130,6 +132,7 @@ Please read [our contribution guidelines](CONTRIBUTING.md), and thank you for be
 ## Authors & contributors
 
 The original setup of this repository is by [Janik Kahle](https://github.com/PlaxXOnline).
+
 The mcbroken API is by [Rashiq](https://github.com/rashiq).
 
 For a full list of all authors and contributors, see [the contributors page](https://github.com/PlaxXOnline/mcbroken_app/contributors).
