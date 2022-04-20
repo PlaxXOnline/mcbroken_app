@@ -51,13 +51,6 @@
 
 ## About
 
-> **[?]**
-> Provide general information about your project here.
-> What problem does it (intend to) solve?
-> What is the purpose of your project?
-> Why did you undertake it?
-> You don't have to answer all the questions -- just the ones relevant to your project.
-
 Haven't you ever driven to a McDonalds on a hot summer day with a craving for ice cream? Or a McFlurry?
 
 Yes?
@@ -72,8 +65,6 @@ Rashiq only had a website available at the time of development, so I thought I'd
 <summary>Screenshots</summary>
 <br>
 
-> **[?]**
-
 |                          Machine is working                           |                        Machine is not working                          |
 | :-------------------------------------------------------------------: | :--------------------------------------------------------------------: |
 | <img src="docs/images/mcbroken_works.png" title="Machine is working" width="100%"> | <img src="docs/images/mcbroken_notworking.png" title="Machine is not working" width="100%"> |
@@ -86,17 +77,13 @@ Rashiq only had a website available at the time of development, so I thought I'd
 
 ### Built With
 
-> **[?]**
-> Please provide the technologies that are used in the project.
-
 This Application was build with Flutter.
 
 ## Getting Started
 
 ### Prerequisites
 
-> **[?]**
-> What are the project requirements/dependencies?
+TBA
 
 ### Installation
 
