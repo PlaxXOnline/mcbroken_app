@@ -33,7 +33,6 @@
 - [About](#about)
   - [Built With](#built-with)
 - [Getting Started](#getting-started)
-  - [Prerequisites](#prerequisites)
   - [Installation](#installation)
 - [Usage](#usage)
 - [Roadmap](#roadmap)
@@ -77,17 +76,35 @@ Rashiq only had a website available at the time of development, so I thought I'd
 
 ### Built With
 
-This Application was build with Flutter.
+This Application was build with:
+
+- [Flutter](https://www.flutter.dev/)
+- [BLoC](https://pub.dev/packages/bloc)
+- [flutter_bloc](https://pub.dev/packages/flutter_bloc)
+- [connectivity_plus](https://pub.dev/packages/connectivity_plus)
+- [flutter_map](https://pub.dev/packages/flutter_map)
+- [http](https://pub.dev/packages/http)
+- [latlong2](https://pub.dev/packages/latlong2)
+- [flutter_map_marker_cluster](https://pub.dev/packages/flutter_map_marker_cluster)
 
 ## Getting Started
-
-### Prerequisites
-
-TBA
 
 ### Installation
 
 First, download and install [Flutter](https://www.flutter.dev/).
+Then Clone the Repository:
+
+```sh
+git clone <https://github.com/PlaxXOnline/mcbroken_app.git>
+```
+
+Run
+
+```sh
+flutter pub get
+```
+
+Start your Simulator or connect your Smartphone and hit the run button.
 
 ## Usage
 
