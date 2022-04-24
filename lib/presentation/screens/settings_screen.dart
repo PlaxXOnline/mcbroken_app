@@ -14,7 +14,7 @@ class SettingsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Settings'),
+        title: const Center(child: Text('Einstellungen')),
         leading: BackButton(
           onPressed: () => Navigator.of(context).pop(),
         ),
@@ -47,12 +47,12 @@ class SettingsScreen extends StatelessWidget {
                           return SettingsList(
                             sections: [
                               SettingsSection(
-                                title: const Text('General'),
+                                title: const Text('Allgemein'),
                                 tiles: [
                                   SettingsTile.navigation(
                                     leading: const Icon(Icons.language),
-                                    title: const Text('Language'),
-                                    value: const Text('English'),
+                                    title: const Text('Sprache'),
+                                    value: const Text('Deutsch'),
                                   ),
                                 ],
                               ),

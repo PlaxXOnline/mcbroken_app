@@ -1,4 +1,4 @@
-package com.example.mcbroken
+package de.JKDev.mcbroken
 
 import io.flutter.embedding.android.FlutterActivity
 
