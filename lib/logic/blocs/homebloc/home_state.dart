@@ -10,6 +10,7 @@ class HomeStateInitial extends HomeState {}
 class HomeStateLoading extends HomeState {}
 
 class HomeStateLoaded extends HomeState {
+  final TextEditingController textEditingController = TextEditingController();
   final List<McDonaldsModel> mcDonaldsData;
 
   HomeStateLoaded(this.mcDonaldsData);

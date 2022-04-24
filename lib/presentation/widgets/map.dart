@@ -16,17 +16,11 @@ class McDonaldsMap extends StatefulWidget {
 class _McDonaldsMapState extends State<McDonaldsMap> {
   List<McDonaldsModel> mcDonaldsData = <McDonaldsModel>[];
   final PopupController popupController = PopupController();
-  late final McDonaldsModel data;
 
   @override
   void initState() {
     super.initState();
   }
-
-/* class McDonaldsMap extends StatelessWidget {
-  final List<McDonaldsModel> mcDonaldsData;
-  const McDonaldsMap({Key? key, required this.mcDonaldsData})
-      : super(key: key); */
 
   @override
   Widget build(BuildContext context) {
@@ -54,16 +48,7 @@ class _McDonaldsMapState extends State<McDonaldsMap> {
                     ? Colors.green
                     : Colors.red,
               ),
-            ), /* IconButton(
-              iconSize: 75.0,
-              color: mcDonaldsData[i].properties.dot == 'working'
-                  ? Colors.green
-                  : Colors.red,
-              icon: const Icon(Icons.location_on),
-              onPressed: () {
-                mcDonaldsDetailSheet(context, i);
-              },
-            ), */
+            ),
           ),
         ),
     ];
@@ -212,96 +197,6 @@ class _McDonaldsMapState extends State<McDonaldsMap> {
       ],
     );
   }
-
-  /* Future<dynamic> mcDonaldsDetailSheet(BuildContext context, int index) {
-    return showModalBottomSheet(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10.0),
-      ),
-      isScrollControlled: true,
-      context: context,
-      builder: (BuildContext context) {
-        return StatefulBuilder(
-          builder: (BuildContext context, StateSetter setSheetState) {
-            return FractionallySizedBox(
-              heightFactor: 0.5,
-              child: Padding(
-                padding:
-                    const EdgeInsets.only(top: 20.0, left: 20.0, right: 20.0),
-                child: Column(
-                  children: [
-                    Image.asset('assets/flurry_big_transparent.png'),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Text(
-                          'McDonalds ',
-                          style: TextStyle(
-                            fontSize: 20.0,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        Text(
-                          mcDonaldsData[index].properties.city,
-                          style: const TextStyle(
-                            fontSize: 20.0,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    Text(
-                      mcDonaldsData[index].properties.street,
-                      style: const TextStyle(
-                        fontSize: 15.0,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(
-                      height: 70,
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Text(
-                          'Eismaschine: ',
-                          style: TextStyle(
-                            fontSize: 20.0,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        Text(
-                          mcDonaldsData[index].properties.dot == 'working'
-                              ? 'Funktioniert'
-                              : 'Defekt',
-                          style: const TextStyle(
-                            fontSize: 20.0,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        Icon(
-                          mcDonaldsData[index].properties.dot == 'working'
-                              ? Icons.check_circle
-                              : Icons.cancel,
-                          color:
-                              mcDonaldsData[index].properties.dot == 'working'
-                                  ? Colors.green
-                                  : Colors.red,
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            );
-          },
-        );
-      },
-    );
-  } */
 }
 
 class FacilityMarker extends Marker {

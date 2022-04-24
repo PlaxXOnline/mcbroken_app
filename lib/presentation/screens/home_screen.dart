@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:anim_search_bar/anim_search_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mcbroken/constants/enums.dart';
@@ -13,16 +14,10 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final Size size = MediaQuery.of(context).size;
     return Scaffold(
       appBar: AppBar(
         actions: [
-          /* IconButton(
-            icon: const Icon(Icons.search_rounded),
-            onPressed: () {
-              print('such was');
-              //BlocProvider.of<HomeBloc>(context).add(DataRequestEvent());
-            },
-          ), */
           IconButton(
             onPressed: () {
               Navigator.of(context).push(
@@ -60,7 +55,35 @@ class HomeScreen extends StatelessWidget {
                       builder: ((context) {
                         final homeState = context.watch<HomeBloc>().state;
                         if (homeState is HomeStateLoaded) {
-                          return const McDonaldsMap();
+                          return SafeArea(
+                            bottom: false,
+                            child: Stack(
+                              children: [
+                                const McDonaldsMap(),
+                                Padding(
+                                  padding: const EdgeInsets.only(
+                                    right: 10.0,
+                                    left: 10.0,
+                                  ),
+                                  child: AnimSearchBar(
+                                    color: Theme.of(context).primaryColor,
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                    ),
+                                    prefixIcon: const Icon(
+                                      Icons.search_rounded,
+                                      color: Colors.white,
+                                    ),
+                                    rtl: true,
+                                    width: size.width,
+                                    textController:
+                                        homeState.textEditingController,
+                                    onSuffixTap: () {},
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
                         } else if (homeState is HomeStateError) {
                           return Center(
                             child: Text(homeState.error),

@@ -35,6 +35,7 @@ dependencies:
   latlong2: ^0.8.1
   flutter_map_marker_cluster: ^0.4.4
   settings_ui: ^2.0.2
+  anim_search_bar: ^2.0.2
 
 dev_dependencies:
   flutter_test:

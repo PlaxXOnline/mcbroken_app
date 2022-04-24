@@ -1,11 +1,11 @@
 import 'dart:async';
 import 'dart:developer';
 
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mcbroken/data/models/mcdonalds_model.dart';
 import 'package:mcbroken/data/repository/mcdonalds_repository.dart';
 import 'package:mcbroken/logic/cubits/internetcubit/internet_cubit.dart';
-import 'package:meta/meta.dart';
 
 part 'home_event.dart';
 part 'home_state.dart';
