@@ -1,22 +1,24 @@
+// ignore_for_file: non_constant_identifier_names
+
 import 'dart:convert';
 import 'package:collection/collection.dart';
 
-class Mcdonalds_model {
+class McDonaldsModel {
   final Geometry geometry;
   final Properties properties;
   final String type;
-  Mcdonalds_model({
+  McDonaldsModel({
     required this.geometry,
     required this.properties,
     required this.type,
   });
 
-  Mcdonalds_model copyWith({
+  McDonaldsModel copyWith({
     Geometry? geometry,
     Properties? properties,
     String? type,
   }) {
-    return Mcdonalds_model(
+    return McDonaldsModel(
       geometry: geometry ?? this.geometry,
       properties: properties ?? this.properties,
       type: type ?? this.type,
@@ -33,8 +35,8 @@ class Mcdonalds_model {
     return result;
   }
 
-  factory Mcdonalds_model.fromMap(Map<String, dynamic> map) {
-    return Mcdonalds_model(
+  factory McDonaldsModel.fromMap(Map<String, dynamic> map) {
+    return McDonaldsModel(
       geometry: Geometry.fromMap(map['geometry']),
       properties: Properties.fromMap(map['properties']),
       type: map['type'] ?? '',
@@ -43,18 +45,18 @@ class Mcdonalds_model {
 
   String toJson() => json.encode(toMap());
 
-  factory Mcdonalds_model.fromJson(String source) =>
-      Mcdonalds_model.fromMap(json.decode(source));
+  factory McDonaldsModel.fromJson(String source) =>
+      McDonaldsModel.fromMap(json.decode(source));
 
   @override
   String toString() =>
-      'Mcdonalds_model(geometry: $geometry, properties: $properties, type: $type)';
+      'McDonaldsModel(geometry: $geometry, properties: $properties, type: $type)';
 
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
 
-    return other is Mcdonalds_model &&
+    return other is McDonaldsModel &&
         other.geometry == geometry &&
         other.properties == properties &&
         other.type == type;

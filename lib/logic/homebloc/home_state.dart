@@ -10,9 +10,9 @@ class HomeStateInitial extends HomeState {}
 class HomeStateLoading extends HomeState {}
 
 class HomeStateLoaded extends HomeState {
-  final List<Mcdonalds_model> mcdonalds_data;
+  final List<McDonaldsModel> mcDonaldsData;
 
-  HomeStateLoaded(this.mcdonalds_data);
+  HomeStateLoaded(this.mcDonaldsData);
 }
 
 class HomeStateError extends HomeState {

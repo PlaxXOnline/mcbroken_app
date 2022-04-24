@@ -3,18 +3,20 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:mcbroken/data/models/mcdonalds_model.dart';
+import 'package:mcbroken/data/models/McDonalds_Model.dart';
 import 'package:mcbroken/logic/homebloc/home_bloc.dart';
 
 class McDonaldsMap extends StatefulWidget {
+  const McDonaldsMap({Key? key}) : super(key: key);
+
   @override
   _McDonaldsMapState createState() => _McDonaldsMapState();
 }
 
 class _McDonaldsMapState extends State<McDonaldsMap> {
-  List<Mcdonalds_model> mcdonalds_data = <Mcdonalds_model>[];
+  List<McDonaldsModel> mcDonaldsData = <McDonaldsModel>[];
   final PopupController popupController = PopupController();
-  late final Mcdonalds_model data;
+  late final McDonaldsModel data;
 
   @override
   void initState() {
@@ -22,39 +24,39 @@ class _McDonaldsMapState extends State<McDonaldsMap> {
   }
 
 /* class McDonaldsMap extends StatelessWidget {
-  final List<Mcdonalds_model> mcdonalds_data;
-  const McDonaldsMap({Key? key, required this.mcdonalds_data})
+  final List<McDonaldsModel> mcDonaldsData;
+  const McDonaldsMap({Key? key, required this.mcDonaldsData})
       : super(key: key); */
 
   @override
   Widget build(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
-    mcdonalds_data = BlocProvider.of<HomeBloc>(context).mcDonaldsData;
+    mcDonaldsData = BlocProvider.of<HomeBloc>(context).mcDonaldsData;
     var markers = <FacilityMarker>[
-      for (int i = 0, len = mcdonalds_data.length; i < len; i++)
+      for (int i = 0, len = mcDonaldsData.length; i < len; i++)
         FacilityMarker(
           width: 80.0,
           height: 80.0,
           point: LatLng(
-            double.parse(mcdonalds_data[i].geometry.coordinates[1]),
-            double.parse(mcdonalds_data[i].geometry.coordinates[0]),
+            double.parse(mcDonaldsData[i].geometry.coordinates[1]),
+            double.parse(mcDonaldsData[i].geometry.coordinates[0]),
           ),
-          city: mcdonalds_data[i].properties.city,
-          street: mcdonalds_data[i].properties.street,
-          dot: mcdonalds_data[i].properties.dot,
+          city: mcDonaldsData[i].properties.city,
+          street: mcDonaldsData[i].properties.street,
+          dot: mcDonaldsData[i].properties.dot,
           builder: (ctx) => SizedBox(
             height: 75,
             width: 75,
             child: FittedBox(
               child: Icon(
                 Icons.location_on,
-                color: mcdonalds_data[i].properties.dot == 'working'
+                color: mcDonaldsData[i].properties.dot == 'working'
                     ? Colors.green
                     : Colors.red,
               ),
             ), /* IconButton(
               iconSize: 75.0,
-              color: mcdonalds_data[i].properties.dot == 'working'
+              color: mcDonaldsData[i].properties.dot == 'working'
                   ? Colors.green
                   : Colors.red,
               icon: const Icon(Icons.location_on),
@@ -240,7 +242,7 @@ class _McDonaldsMapState extends State<McDonaldsMap> {
                           ),
                         ),
                         Text(
-                          mcdonalds_data[index].properties.city,
+                          mcDonaldsData[index].properties.city,
                           style: const TextStyle(
                             fontSize: 20.0,
                             fontWeight: FontWeight.bold,
@@ -252,7 +254,7 @@ class _McDonaldsMapState extends State<McDonaldsMap> {
                       height: 10,
                     ),
                     Text(
-                      mcdonalds_data[index].properties.street,
+                      mcDonaldsData[index].properties.street,
                       style: const TextStyle(
                         fontSize: 15.0,
                         fontWeight: FontWeight.bold,
@@ -272,7 +274,7 @@ class _McDonaldsMapState extends State<McDonaldsMap> {
                           ),
                         ),
                         Text(
-                          mcdonalds_data[index].properties.dot == 'working'
+                          mcDonaldsData[index].properties.dot == 'working'
                               ? 'Funktioniert'
                               : 'Defekt',
                           style: const TextStyle(
@@ -281,11 +283,11 @@ class _McDonaldsMapState extends State<McDonaldsMap> {
                           ),
                         ),
                         Icon(
-                          mcdonalds_data[index].properties.dot == 'working'
+                          mcDonaldsData[index].properties.dot == 'working'
                               ? Icons.check_circle
                               : Icons.cancel,
                           color:
-                              mcdonalds_data[index].properties.dot == 'working'
+                              mcDonaldsData[index].properties.dot == 'working'
                                   ? Colors.green
                                   : Colors.red,
                         ),

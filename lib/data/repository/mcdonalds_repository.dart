@@ -1,18 +1,18 @@
 import 'dart:convert';
 
-import 'package:mcbroken/data/models/mcdonalds_model.dart';
+import 'package:mcbroken/data/models/McDonalds_Model.dart';
 import 'package:mcbroken/data/provider/mcdonalds.provider.dart';
 
 class McDonaldsRepository {
   late final McDonaldsDataProvider mcDonaldsDataProvider =
       McDonaldsDataProvider();
 
-  Future<List<Mcdonalds_model>> getDatafromMcDonalds() async {
+  Future<List<McDonaldsModel>> getDatafromMcDonalds() async {
     final rawData = await mcDonaldsDataProvider.fetchData();
-    List<Mcdonalds_model> mcDonaldsData = List<Mcdonalds_model>.from(
-        json.decode(rawData).map((x) => Mcdonalds_model.fromMap(x)));
+    List<McDonaldsModel> mcDonaldsData = List<McDonaldsModel>.from(
+        json.decode(rawData).map((x) => McDonaldsModel.fromMap(x)));
 
-    //final Mcdonalds_model mcDonaldsData = Mcdonalds_model.fromJson(rawData);
+    //final McDonaldsModel mcDonaldsData = McDonaldsModel.fromJson(rawData);
 
     return mcDonaldsData;
   }

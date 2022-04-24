@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mcbroken/constants/enums.dart';
@@ -33,18 +35,18 @@ class HomeScreen extends StatelessWidget {
             Builder(
               builder: (blocContext) {
                 var internetState = context.watch<InternetCubit>().state;
-                print(internetState);
+                log(internetState.toString());
                 if (internetState is InternetConnected &&
-                        internetState.connectionType == ConnectionType.Wifi ||
+                        internetState.connectionType == ConnectionType.wifi ||
                     internetState is InternetConnected &&
-                        internetState.connectionType == ConnectionType.Mobile) {
+                        internetState.connectionType == ConnectionType.mobile) {
                   context.read<HomeBloc>().add(DataRequestEvent());
                   return Flexible(
                     child: Builder(
                       builder: ((context) {
                         final homeState = context.watch<HomeBloc>().state;
                         if (homeState is HomeStateLoaded) {
-                          return McDonaldsMap();
+                          return const McDonaldsMap();
                         } else if (homeState is HomeStateError) {
                           return Center(
                             child: Text(homeState.error),
