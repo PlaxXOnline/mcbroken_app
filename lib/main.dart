@@ -1,8 +1,8 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:mcbroken/logic/homebloc/home_bloc.dart';
-import 'package:mcbroken/logic/internetcubit/internet_cubit.dart';
+import 'package:mcbroken/logic/blocs/homebloc/home_bloc.dart';
+import 'package:mcbroken/logic/cubits/internetcubit/internet_cubit.dart';
 import 'package:mcbroken/presentation/screens/home_screen.dart';
 
 void main() {
