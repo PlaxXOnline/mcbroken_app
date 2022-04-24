@@ -114,6 +114,7 @@ If everything is successfully installed, you can just start your IDE and Simulat
 
 - [x] Popups
 - [x] Clustering
+- [ ] Settings
 - [ ] Localizations
 - [ ] Search
 - [ ] Support more Countries
