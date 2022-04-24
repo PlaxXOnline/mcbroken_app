@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mcbroken/constants/enums.dart';
 import 'package:mcbroken/logic/homebloc/home_bloc.dart';
-import 'package:mcbroken/logic/cubit/internet_cubit.dart';
+import 'package:mcbroken/logic/internetcubit/internet_cubit.dart';
 import 'package:mcbroken/presentation/widgets/map.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -14,15 +14,19 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        /* actions: [
-          IconButton(
+        actions: [
+          /* IconButton(
             icon: const Icon(Icons.search_rounded),
             onPressed: () {
               print('such was');
               //BlocProvider.of<HomeBloc>(context).add(DataRequestEvent());
             },
+          ), */
+          IconButton(
+            onPressed: () {},
+            icon: const Icon(Icons.settings_rounded),
           ),
-        ], */
+        ],
         leading: Image.asset(
           'assets/flurry_icon.ico',
         ),
