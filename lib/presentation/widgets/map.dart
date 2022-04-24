@@ -213,7 +213,7 @@ class _McDonaldsMapState extends State<McDonaldsMap> {
     );
   }
 
-  Future<dynamic> mcDonaldsDetailSheet(BuildContext context, int index) {
+  /* Future<dynamic> mcDonaldsDetailSheet(BuildContext context, int index) {
     return showModalBottomSheet(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10.0),
@@ -301,7 +301,7 @@ class _McDonaldsMapState extends State<McDonaldsMap> {
         );
       },
     );
-  }
+  } */
 }
 
 class FacilityMarker extends Marker {

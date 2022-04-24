@@ -19,8 +19,6 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   HomeBloc({this.internetCubit}) : super(HomeStateInitial()) {
     log("HomeState initializing...");
 
-    //on<DataRequestEvent>((event, emit) async {});
-
     on<DataRequestEvent>(_onDataRequestEvent);
   }
   @override

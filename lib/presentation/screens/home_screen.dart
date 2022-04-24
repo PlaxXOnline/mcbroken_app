@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mcbroken/constants/enums.dart';
 import 'package:mcbroken/logic/blocs/homebloc/home_bloc.dart';
 import 'package:mcbroken/logic/cubits/internetcubit/internet_cubit.dart';
+import 'package:mcbroken/presentation/screens/settings_screen.dart';
 import 'package:mcbroken/presentation/widgets/map.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -23,12 +24,21 @@ class HomeScreen extends StatelessWidget {
             },
           ), */
           IconButton(
-            onPressed: () {},
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => const SettingsScreen(),
+                ),
+              );
+            },
             icon: const Icon(Icons.settings_rounded),
           ),
         ],
-        leading: Image.asset(
-          'assets/flurry_icon.ico',
+        leading: Hero(
+          tag: 'flurry_icon',
+          child: Image.asset(
+            'assets/flurry_icon.ico',
+          ),
         ),
         title: const Text('McBroken'),
         centerTitle: true,
