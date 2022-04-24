@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:mcbroken/data/models/McDonalds_Model.dart';
+import 'package:mcbroken/data/models/mcdonalds_model.dart';
 import 'package:mcbroken/data/provider/mcdonalds.provider.dart';
 
 class McDonaldsRepository {

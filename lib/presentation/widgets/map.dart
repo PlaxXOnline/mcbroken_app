@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:mcbroken/data/models/McDonalds_Model.dart';
+import 'package:mcbroken/data/models/mcdonalds_model.dart';
 import 'package:mcbroken/logic/homebloc/home_bloc.dart';
 
 class McDonaldsMap extends StatefulWidget {
