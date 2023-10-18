@@ -86,6 +86,9 @@ This Application was build with:
 - [http](https://pub.dev/packages/http)
 - [latlong2](https://pub.dev/packages/latlong2)
 - [flutter_map_marker_cluster](https://pub.dev/packages/flutter_map_marker_cluster)
+- [flutter_map_location_marker](https://pub.dev/packages/flutter_map_location_marker)
+- [flutter_native_splash](https://pub.dev/packages/flutter_native_splash)
+- [google_fonts](https://pub.dev/packages/google_fonts)
 
 ## Getting Started
 
@@ -115,7 +118,9 @@ If everything is successfully installed, you can just start your IDE and Simulat
 - [x] Popups
 - [x] Clustering
 - [ ] Settings
-- [ ] Localizations
+- [x] Localizations
+- [x] Show Actual Position
+- [x] SplashScreen
 - [ ] Search
 - [ ] Support more Countries
 

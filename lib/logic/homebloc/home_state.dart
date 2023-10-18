@@ -11,8 +11,9 @@ class HomeStateLoading extends HomeState {}
 
 class HomeStateLoaded extends HomeState {
   final List<Mcdonalds_model> mcdonalds_data;
+  final Position position;
 
-  HomeStateLoaded(this.mcdonalds_data);
+  HomeStateLoaded(this.mcdonalds_data, this.position);
 }
 
 class HomeStateError extends HomeState {
