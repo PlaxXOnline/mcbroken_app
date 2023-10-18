@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_map/flutter_map.dart';
@@ -19,11 +21,21 @@ class McDonaldsMap extends StatefulWidget {
 class _McDonaldsMapState extends State<McDonaldsMap> {
   List<Mcdonalds_model> mcdonalds_data = <Mcdonalds_model>[];
   final PopupController popupController = PopupController();
+  late FollowOnLocationUpdate _followOnLocationUpdate;
+  late StreamController<double?> _followCurrentLocationStreamController;
   late final Mcdonalds_model data;
 
   @override
   void initState() {
     super.initState();
+    _followOnLocationUpdate = FollowOnLocationUpdate.always;
+    _followCurrentLocationStreamController = StreamController<double?>();
+  }
+
+  @override
+  void dispose() {
+    _followCurrentLocationStreamController.close();
+    super.dispose();
   }
 
   @override
@@ -69,6 +81,14 @@ class _McDonaldsMapState extends State<McDonaldsMap> {
           minZoom: 5.0,
           maxZoom: 25.0,
           onTap: (_, __) => popupController.hideAllPopups(),
+          onPositionChanged: (MapPosition position, bool hasGesture) {
+            if (hasGesture &&
+                _followOnLocationUpdate != FollowOnLocationUpdate.never) {
+              setState(
+                () => _followOnLocationUpdate = FollowOnLocationUpdate.never,
+              );
+            }
+          },
         ),
         children: [
           TileLayer(
@@ -113,7 +133,9 @@ class _McDonaldsMapState extends State<McDonaldsMap> {
             ),
           ),
           CurrentLocationLayer(
-            followOnLocationUpdate: FollowOnLocationUpdate.always,
+            followCurrentLocationStream:
+                _followCurrentLocationStreamController.stream,
+            followOnLocationUpdate: _followOnLocationUpdate,
             turnOnHeadingUpdate: TurnOnHeadingUpdate.never,
             style: const LocationMarkerStyle(
               marker: DefaultLocationMarker(
@@ -124,6 +146,27 @@ class _McDonaldsMapState extends State<McDonaldsMap> {
               ),
               markerSize: Size(40, 40),
               markerDirection: MarkerDirection.heading,
+            ),
+          ),
+          Align(
+            alignment: Alignment.bottomRight,
+            child: Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: FloatingActionButton(
+                onPressed: () {
+                  // Follow the location marker on the map when location updated until user interact with the map.
+                  setState(
+                    () =>
+                        _followOnLocationUpdate = FollowOnLocationUpdate.always,
+                  );
+                  // Follow the location marker on the map and zoom the map to level 18.
+                  _followCurrentLocationStreamController.add(18);
+                },
+                child: const Icon(
+                  Icons.my_location,
+                  color: Colors.white,
+                ),
+              ),
             ),
           ),
         ],

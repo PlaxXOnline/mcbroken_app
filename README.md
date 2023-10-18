@@ -120,6 +120,7 @@ If everything is successfully installed, you can just start your IDE and Simulat
 - [ ] Settings
 - [x] Localizations
 - [x] Show Actual Position
+- - [x] Back to Actual Position
 - [x] SplashScreen
 - [ ] Search
 - [ ] Support more Countries
