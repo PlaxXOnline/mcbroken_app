@@ -5,5 +5,15 @@
   "iceMachine": "Eismaschine:",
   "working": "Funktioniert",
   "notWorking": "Defekt",
-  "settingsTitle": "Einstellungen"
+  "settingsTitle": "Einstellungen",
+  "information": "Informationen",
+  "iceMachineTotal": "Eismaschinen gesamt:",
+  "iceMachineWorking": "Eismaschinen funktionstüchtig:",
+  "iceMachineDefect": "Eismaschinen defekt:",
+  "map": "Karte",
+  "showOwnPosition": "Eigene Position anzeigen",
+  "showOnlyWorking": "Nur funktionierende anzeigen",
+  "showOnlyDefect": "Nur defekte anzeigen",
+  "allowRotation": "Rotieren erlauben",
+  "allowZoom": "Zoom erlauben"
 }

@@ -39,49 +39,49 @@ class SettingsScreen extends StatelessWidget {
             applicationType: ApplicationType.both,
             sections: [
               SettingsSection(
-                title: const Text('Informationen'),
+                title: Text(locale.information),
                 tiles: [
                   SettingsTile(
-                    title: const Text('Eismaschinen gesamt:'),
+                    title: Text(locale.iceMachineTotal),
                     value: const Text('100'),
                   ),
                   SettingsTile(
-                    title: const Text('Eismaschinen funktionstüchtig:'),
+                    title: Text(locale.iceMachineWorking),
                     value: const Text('30'),
                   ),
                   SettingsTile(
-                    title: const Text('Eismaschinen defekt:'),
+                    title: Text(locale.iceMachineDefect),
                     value: const Text('70'),
                   ),
                 ],
               ),
               SettingsSection(
-                title: const Text('Map'),
+                title: Text(locale.map),
                 tiles: [
                   SettingsTile.switchTile(
                     initialValue: false,
                     onToggle: (value) {},
-                    title: const Text('Eigene Position anzeigen'),
+                    title: Text(locale.showOwnPosition),
                   ),
                   SettingsTile.switchTile(
                     initialValue: false,
                     onToggle: (value) {},
-                    title: const Text('Nur funktionierende anzeigen'),
+                    title: Text(locale.showOnlyWorking),
                   ),
                   SettingsTile.switchTile(
                     initialValue: false,
                     onToggle: (value) {},
-                    title: const Text('Nur defekte anzeigen'),
+                    title: Text(locale.showOnlyDefect),
                   ),
                   SettingsTile.switchTile(
                     initialValue: false,
                     onToggle: (value) {},
-                    title: const Text('Rotieren erlauben'),
+                    title: Text(locale.allowRotation),
                   ),
                   SettingsTile.switchTile(
                     initialValue: false,
                     onToggle: (value) {},
-                    title: const Text('Zoom erlauben'),
+                    title: Text(locale.allowZoom),
                   ),
                 ],
               )

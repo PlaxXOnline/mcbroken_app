@@ -5,5 +5,15 @@
   "iceMachine": "Ice Machine:",
   "working": "Working",
   "notWorking": "Defect",
-  "settingsTitle": "Settings"
+  "settingsTitle": "Settings",
+  "information": "Information",
+  "iceMachineTotal": "Total ice machines:",
+  "iceMachineWorking": "Ice machines working:",
+  "iceMachineDefect": "Ice machines defect:",
+  "map": "Map",
+  "showOwnPosition": "Show own position",
+  "showOnlyWorking": "Show only working",
+  "showOnlyDefect": "Show only defect",
+  "allowRotation": "Allow rotation",
+  "allowZoom": "Allow zoom"
 }
