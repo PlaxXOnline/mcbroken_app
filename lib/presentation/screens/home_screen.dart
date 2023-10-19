@@ -3,8 +3,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mcbroken/constants/enums.dart';
-import 'package:mcbroken/logic/homebloc/home_bloc.dart';
-import 'package:mcbroken/logic/cubit/internet_cubit.dart';
+import 'package:mcbroken/logic/blocs/home/home_bloc.dart';
+import 'package:mcbroken/logic/cubits/connectivity/internet_cubit.dart';
+import 'package:mcbroken/presentation/screens/settings_screen.dart';
 import 'package:mcbroken/presentation/widgets/map.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
@@ -17,15 +18,17 @@ class HomeScreen extends StatelessWidget {
     final AppLocalizations locale = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
-        /* actions: [
+        actions: [
           IconButton(
-            icon: const Icon(Icons.search_rounded),
+            icon: const Icon(Icons.settings),
             onPressed: () {
-              print('such was');
-              //BlocProvider.of<HomeBloc>(context).add(DataRequestEvent());
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const SettingsScreen()));
             },
           ),
-        ], */
+        ],
         leading: Image.asset(
           'assets/flurry_icon.ico',
         ),

@@ -2,8 +2,9 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
-import 'package:mcbroken/logic/homebloc/home_bloc.dart';
-import 'package:mcbroken/logic/cubit/internet_cubit.dart';
+import 'package:mcbroken/logic/blocs/home/home_bloc.dart';
+import 'package:mcbroken/logic/cubits/connectivity/internet_cubit.dart';
+import 'package:mcbroken/logic/cubits/settings/settings_cubit.dart';
 import 'package:mcbroken/presentation/screens/home_screen.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
@@ -30,14 +31,16 @@ class MyApp extends StatelessWidget {
       providers: [
         BlocProvider.value(value: internetCubit),
         BlocProvider<HomeBloc>(
-          create: (context) => HomeBloc(),
+          create: (_) => HomeBloc(),
+        ),
+        BlocProvider(
+          create: (_) => SettingsCubit(),
         ),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
-        //title: 'McBroken',
         theme: ThemeData(
           primarySwatch: Colors.blue,
           visualDensity: VisualDensity.adaptivePlatformDensity,

@@ -72,6 +72,14 @@ Rashiq only had a website available at the time of development, so I thought I'd
 | :-------------------------------------------------------------------: |
 | <img src="docs/images/mcbroken_clustering.gif" title="mcbroken clustering" width="100%"> |
 
+|                                         SplashScreen                                         |
+|:--------------------------------------------------------------------------------------------:|
+| <img src="docs/images/mcbroken_splashscreen.png" title="mcbroken splashscreen" width="100%"> |
+
+|                                          Actual Position                                           |
+|:--------------------------------------------------------------------------------------------------:|
+| <img src="docs/images/mcbroken_actual_position.png" title="mcbroken actual position" width="100%"> |
+
 </details>
 
 ### Built With

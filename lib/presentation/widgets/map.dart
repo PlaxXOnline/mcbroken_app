@@ -7,7 +7,7 @@ import 'package:flutter_map_location_marker/flutter_map_location_marker.dart';
 import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:mcbroken/data/models/mcdonalds_model.dart';
-import 'package:mcbroken/logic/homebloc/home_bloc.dart';
+import 'package:mcbroken/logic/blocs/home/home_bloc.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:mcbroken/presentation/widgets/widgets.dart';
 

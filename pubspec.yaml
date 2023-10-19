@@ -29,6 +29,8 @@ dependencies:
   flutter_native_splash: ^2.2.16
   google_fonts: ^6.1.0
   flutter_map_location_marker: ^8.0.0
+  equatable: ^2.0.5
+  settings_ui: ^2.0.2
 
 dev_dependencies:
   flutter_test:

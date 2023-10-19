@@ -4,5 +4,6 @@
   "mcDonalds": "McDonalds ",
   "iceMachine": "Eismaschine:",
   "working": "Funktioniert",
-  "notWorking": "Defekt"
+  "notWorking": "Defekt",
+  "settingsTitle": "Einstellungen"
 }
