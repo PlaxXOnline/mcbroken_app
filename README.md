@@ -125,7 +125,7 @@ If everything is successfully installed, you can just start your IDE and Simulat
 
 - [x] Popups
 - [x] Clustering
-- [ ] Settings
+- [x] Settings
 - [x] Localizations
 - [x] Show Actual Position
 - - [x] Back to Actual Position
