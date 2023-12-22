@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:mcbroken/data/models/mcdonalds_model.dart';
+import 'package:mcbroken/logic/blocs/home/home_bloc.dart';
 import 'package:mcbroken/logic/cubits/settings/settings_cubit.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:settings_ui/settings_ui.dart';
@@ -30,6 +32,14 @@ class SettingsScreen extends StatelessWidget {
   Widget buildSettingsList(
       BuildContext context, SettingsState state, AppLocalizations locale) {
     final Size size = MediaQuery.of(context).size;
+    final HomeBloc homeBloc = context.read<HomeBloc>();
+
+    final List<Mcdonalds_model> workingList = homeBloc.mcDonaldsData
+        .where((element) => element.properties.is_broken == false)
+        .toList();
+    final List<Mcdonalds_model> notWorkingList = homeBloc.mcDonaldsData
+        .where((element) => element.properties.is_broken == true)
+        .toList();
 
     return BlocBuilder<SettingsCubit, SettingsState>(
       buildWhen: (old, next) => old != next,
@@ -43,15 +53,15 @@ class SettingsScreen extends StatelessWidget {
                 tiles: [
                   SettingsTile(
                     title: Text(locale.iceMachineTotal),
-                    value: const Text('100'),
+                    value: Text(homeBloc.mcDonaldsData.length.toString()),
                   ),
                   SettingsTile(
                     title: Text(locale.iceMachineWorking),
-                    value: const Text('30'),
+                    value: Text(workingList.length.toString()),
                   ),
                   SettingsTile(
                     title: Text(locale.iceMachineDefect),
-                    value: const Text('70'),
+                    value: Text(notWorkingList.length.toString()),
                   ),
                 ],
               ),
@@ -59,28 +69,36 @@ class SettingsScreen extends StatelessWidget {
                 title: Text(locale.map),
                 tiles: [
                   SettingsTile.switchTile(
-                    initialValue: false,
-                    onToggle: (value) {},
+                    initialValue: state.showOwnPosition,
+                    onToggle: (value) => context
+                        .read<SettingsCubit>()
+                        .togglePositionSwitch(value),
                     title: Text(locale.showOwnPosition),
                   ),
                   SettingsTile.switchTile(
-                    initialValue: false,
-                    onToggle: (value) {},
+                    initialValue: state.showOnlyWorking,
+                    onToggle: (value) => context
+                        .read<SettingsCubit>()
+                        .toggleWorkingSwitch(value),
                     title: Text(locale.showOnlyWorking),
                   ),
                   SettingsTile.switchTile(
-                    initialValue: false,
-                    onToggle: (value) {},
+                    initialValue: state.showOnlyDefect,
+                    onToggle: (value) =>
+                        context.read<SettingsCubit>().toggleDefectSwitch(value),
                     title: Text(locale.showOnlyDefect),
                   ),
                   SettingsTile.switchTile(
-                    initialValue: false,
-                    onToggle: (value) {},
+                    initialValue: state.allowRotation,
+                    onToggle: (value) => context
+                        .read<SettingsCubit>()
+                        .toggleRotationSwitch(value),
                     title: Text(locale.allowRotation),
                   ),
                   SettingsTile.switchTile(
-                    initialValue: false,
-                    onToggle: (value) {},
+                    initialValue: state.allowZoom,
+                    onToggle: (value) =>
+                        context.read<SettingsCubit>().toggleZoomSwitch(value),
                     title: Text(locale.allowZoom),
                   ),
                 ],

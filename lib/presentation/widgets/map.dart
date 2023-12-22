@@ -9,6 +9,7 @@ import 'package:latlong2/latlong.dart';
 import 'package:mcbroken/data/models/mcdonalds_model.dart';
 import 'package:mcbroken/logic/blocs/home/home_bloc.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:mcbroken/logic/cubits/settings/settings_cubit.dart';
 import 'package:mcbroken/presentation/widgets/widgets.dart';
 
 class McDonaldsMap extends StatefulWidget {
@@ -71,105 +72,121 @@ class _McDonaldsMapState extends State<McDonaldsMap> {
         ),
     ];
 
+    final List<FacilityMarker> workingMarker =
+        markers.where((element) => element.dot == 'working').toList();
+    final List<FacilityMarker> notWorkingMarker =
+        markers.where((element) => element.dot == 'broken').toList();
+
     return PopupScope(
       popupController: popupController,
-      child: FlutterMap(
-        options: MapOptions(
-          initialCenter:
-              LatLng(homeBloc.position.latitude, homeBloc.position.longitude),
-          initialZoom: 15.0,
-          minZoom: 5.0,
-          maxZoom: 25.0,
-          onTap: (_, __) => popupController.hideAllPopups(),
-          onPositionChanged: (MapPosition position, bool hasGesture) {
-            if (hasGesture &&
-                _followOnLocationUpdate != FollowOnLocationUpdate.never) {
-              setState(
-                () => _followOnLocationUpdate = FollowOnLocationUpdate.never,
-              );
-            }
-          },
-        ),
-        children: [
-          TileLayer(
-            urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-            userAgentPackageName: 'dev.kahle.mcbroken',
-            subdomains: const ['a', 'b', 'c'],
-            tileProvider: NetworkTileProvider(),
-          ),
-          MarkerClusterLayerWidget(
-            options: MarkerClusterLayerOptions(
-              maxClusterRadius: 120,
-              size: const Size(40, 40),
-              padding: const EdgeInsets.all(50),
-              markers: markers,
-              polygonOptions: const PolygonOptions(
-                  borderColor: Colors.blueAccent,
-                  color: Colors.black12,
-                  borderStrokeWidth: 3),
-              popupOptions: PopupOptions(
-                  popupSnap: PopupSnap.markerTop,
-                  popupController: popupController,
-                  popupBuilder: (_, marker) {
-                    final facilityMarker = marker as FacilityMarker;
-                    return InfoPopup(
-                        size: size,
-                        locale: locale,
-                        facilityMarker: facilityMarker);
-                  }),
-              builder: (context, markers) {
-                return Container(
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(20.0),
-                      color: Colors.blue),
-                  child: Center(
-                    child: Text(
-                      markers.length.toString(),
-                      style: const TextStyle(color: Colors.white),
-                    ),
-                  ),
-                );
-              },
-            ),
-          ),
-          CurrentLocationLayer(
-            followCurrentLocationStream:
-                _followCurrentLocationStreamController.stream,
-            followOnLocationUpdate: _followOnLocationUpdate,
-            turnOnHeadingUpdate: TurnOnHeadingUpdate.never,
-            style: const LocationMarkerStyle(
-              marker: DefaultLocationMarker(
-                child: Icon(
-                  Icons.navigation,
-                  color: Colors.white,
-                ),
-              ),
-              markerSize: Size(40, 40),
-              markerDirection: MarkerDirection.heading,
-            ),
-          ),
-          Align(
-            alignment: Alignment.bottomRight,
-            child: Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: FloatingActionButton(
-                onPressed: () {
-                  // Follow the location marker on the map when location updated until user interact with the map.
+      child: BlocBuilder<SettingsCubit, SettingsState>(
+        buildWhen: (old, next) => old != next,
+        builder: (context, state) {
+          List<FacilityMarker> selectedMarker = state.showOnlyWorking
+              ? workingMarker
+              : (state.showOnlyDefect ? notWorkingMarker : markers);
+          return FlutterMap(
+            options: MapOptions(
+              initialCenter: state.showOwnPosition
+                  ? LatLng(
+                      homeBloc.position.latitude, homeBloc.position.longitude)
+                  : const LatLng(48.7758, 9.1829),
+              initialZoom: 15.0,
+              minZoom: state.allowZoom ? 5.0 : 10.0,
+              maxZoom: state.allowZoom ? 25.0 : 10.0,
+              onTap: (_, __) => popupController.hideAllPopups(),
+              onPositionChanged: (MapPosition position, bool hasGesture) {
+                if (hasGesture &&
+                    _followOnLocationUpdate != FollowOnLocationUpdate.never) {
                   setState(
                     () =>
-                        _followOnLocationUpdate = FollowOnLocationUpdate.always,
+                        _followOnLocationUpdate = FollowOnLocationUpdate.never,
                   );
-                  // Follow the location marker on the map and zoom the map to level 18.
-                  _followCurrentLocationStreamController.add(18);
-                },
-                child: const Icon(
-                  Icons.my_location,
-                  color: Colors.white,
+                }
+              },
+            ),
+            children: [
+              TileLayer(
+                urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                userAgentPackageName: 'dev.kahle.mcbroken',
+                //subdomains: const ['a', 'b', 'c'],
+                tileProvider: NetworkTileProvider(),
+              ),
+              MarkerClusterLayerWidget(
+                options: MarkerClusterLayerOptions(
+                  maxClusterRadius: 120,
+                  size: const Size(40, 40),
+                  padding: const EdgeInsets.all(50),
+                  markers: selectedMarker,
+                  polygonOptions: const PolygonOptions(
+                      borderColor: Colors.blueAccent,
+                      color: Colors.black12,
+                      borderStrokeWidth: 3),
+                  popupOptions: PopupOptions(
+                      popupSnap: PopupSnap.markerTop,
+                      popupController: popupController,
+                      popupBuilder: (_, marker) {
+                        final facilityMarker = marker as FacilityMarker;
+                        return InfoPopup(
+                            size: size,
+                            locale: locale,
+                            facilityMarker: facilityMarker);
+                      }),
+                  builder: (context, markers) {
+                    return Container(
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(20.0),
+                          color: Colors.blue),
+                      child: Center(
+                        child: Text(
+                          markers.length.toString(),
+                          style: const TextStyle(color: Colors.white),
+                        ),
+                      ),
+                    );
+                  },
                 ),
               ),
-            ),
-          ),
-        ],
+              CurrentLocationLayer(
+                followCurrentLocationStream:
+                    _followCurrentLocationStreamController.stream,
+                followOnLocationUpdate: _followOnLocationUpdate,
+                turnOnHeadingUpdate: TurnOnHeadingUpdate.never,
+                style: const LocationMarkerStyle(
+                  marker: DefaultLocationMarker(
+                    child: Icon(
+                      Icons.navigation,
+                      color: Colors.white,
+                    ),
+                  ),
+                  markerSize: Size(40, 40),
+                  markerDirection: MarkerDirection.heading,
+                ),
+              ),
+              Align(
+                alignment: Alignment.bottomRight,
+                child: Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: FloatingActionButton(
+                    onPressed: () {
+                      // Follow the location marker on the map when location updated until user interact with the map.
+                      setState(
+                        () => _followOnLocationUpdate =
+                            FollowOnLocationUpdate.always,
+                      );
+                      // Follow the location marker on the map and zoom the map to level 18.
+                      _followCurrentLocationStreamController.add(18);
+                    },
+                    child: const Icon(
+                      Icons.my_location,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          );
+        },
       ),
     );
   }
