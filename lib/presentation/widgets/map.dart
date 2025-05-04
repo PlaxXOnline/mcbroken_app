@@ -5,7 +5,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_marker_cluster_plus/flutter_map_marker_cluster_plus.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:mcbroken/data/models/mcdonalds_model.dart';
+import 'package:mcbroken/data/models/mcdonalds_location.dart';
 import 'package:mcbroken/logic/blocs/home/home_bloc.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:mcbroken/logic/cubits/settings/settings_cubit.dart';
@@ -67,7 +67,7 @@ class _McDonaldsMapState extends State<McDonaldsMap> {
   /// @param data Liste der McDonald's-Standortdaten als Modellobjekte.
   /// @param size Bildschirmgröße für responsive Darstellung.
   /// @return Liste von Markern zur Darstellung auf der Karte.
-  List<Marker> _buildMarkers(List<Mcdonalds_model> data, Size size) {
+  List<Marker> _buildMarkers(List<McDonaldsLocation> data, Size size) {
     // Sicherstellen, dass wir nur valide Daten verarbeiten
     if (data.isEmpty) {
       return [];
@@ -85,18 +85,11 @@ class _McDonaldsMapState extends State<McDonaldsMap> {
       double? longitude;
       
       try {
-        // Breitengrad (latitude) ist normalerweise die zweite Koordinate [1]
-        latitude = location.geometry.coordinates[1] is String 
-            ? double.parse(location.geometry.coordinates[1] as String)
-            : location.geometry.coordinates[1] as double;
-            
-        // Längengrad (longitude) ist normalerweise die erste Koordinate [0]
-        longitude = location.geometry.coordinates[0] is String
-            ? double.parse(location.geometry.coordinates[0] as String)
-            : location.geometry.coordinates[0] as double;
+        // Längen- und Breitengrade aus den Koordinaten extrahieren
+        longitude = location.geometry.coordinates[0];
+        latitude = location.geometry.coordinates[1];
             
         // Koordinaten-Vertauschung erkennen und korrigieren
-        // (manchmal werden Koordinaten in umgekehrter Reihenfolge gespeichert)
         if (latitude > 90 || latitude < -90) {
           // Wenn der Breitengrad außerhalb des gültigen Bereichs liegt, könnten die Werte vertauscht sein
           final temp = latitude;
@@ -105,13 +98,7 @@ class _McDonaldsMapState extends State<McDonaldsMap> {
         }
       } catch (e) {
         // Bei Konvertierungsfehlern diesen Marker überspringen
-        debugPrint('Fehler beim Parsen der Koordinaten: $e');
-        skippedCount++;
-        continue;
-      }
-      
-      // Nur gültige Koordinaten verwenden (keine null-Werte oder extreme Werte)
-      if (latitude == null || longitude == null) {
+        debugPrint('Fehler beim Verarbeiten der Koordinaten: $e');
         skippedCount++;
         continue;
       }
@@ -119,23 +106,26 @@ class _McDonaldsMapState extends State<McDonaldsMap> {
       // Prüfen, ob es sich um einen deutschen Standort handelt (grobe Abschätzung)
       // Deutschland liegt etwa zwischen 47° und 55° Nord, 6° und 15° Ost
       bool isGermany = (latitude >= 47.0 && latitude <= 55.0 && 
-                        longitude >= 6.0 && longitude <= 15.0);
+                       longitude >= 6.0 && longitude <= 15.0);
                         
       if (isGermany) {
         germanCount++;
       }
+      
+      // Marker-Status (rot oder grün) festlegen basierend auf dem Status der Eismaschine
+      final String dotStatus = location.properties.isBroken ? 'broken' : 'working';
       
       // Gültigen Marker erstellen
       final marker = FacilityMarker(
         width: 30, // Feste Werte für stabile Darstellung
         height: 30,
         point: LatLng(latitude, longitude),
-        city: location.properties.city,
-        street: location.properties.street,
-        dot: location.properties.dot,
+        city: location.properties.city ?? '',
+        street: location.properties.street ?? '',
+        dot: dotStatus,
         child: Icon(
           Icons.location_on,
-          color: location.properties.dot == 'working' ? Colors.green : Colors.red,
+          color: dotStatus == 'working' ? Colors.green : Colors.red,
           size: 30.0,
         ),
       );
@@ -188,22 +178,25 @@ class _McDonaldsMapState extends State<McDonaldsMap> {
     
     return BlocBuilder<HomeBloc, HomeState>(
       buildWhen: (previous, current) => 
-        current is HomeStateLoaded || current is HomeStateError || current is HomeStateInitial,
+        current is HomeStateLoaded || current is HomeStateNoLocation || 
+        current is HomeStateError || current is HomeStateInitial,
       builder: (context, homeState) {
         // Position und Markerdaten basierend auf dem HomeState definieren
         Position? currentPosition;
-        List<Mcdonalds_model> mcdonaldsData = [];
+        List<McDonaldsLocation> mcdonaldsData = [];
         
         // Je nach Zustand die entsprechenden Daten extrahieren
         if (homeState is HomeStateLoaded) {
           currentPosition = homeState.position;
-          
-          // Zugriff auf die vollständige Liste der McDonald's-Daten (KORRIGIERT)
-          // Entscheidend ist hier die korrekte Feldreferenz
-          mcdonaldsData = homeState.mcdonalds_data; 
-          
-          // Debug-Information zur Anzahl der geladenen Standorte
+          mcdonaldsData = homeState.mcdonalds_data;
           debugPrint('Geladene McDonaldsData: ${mcdonaldsData.length}');
+        } else if (homeState is HomeStateNoLocation) {
+          mcdonaldsData = homeState.mcdonalds_data;
+          debugPrint('Geladene McDonaldsData (ohne Position): ${mcdonaldsData.length}');
+        } else if (homeState is HomeStateOffline) {
+          currentPosition = homeState.position;
+          mcdonaldsData = homeState.locations;
+          debugPrint('Geladene McDonaldsData (offline): ${mcdonaldsData.length}');
         }
         
         // Marker erstellen und validieren

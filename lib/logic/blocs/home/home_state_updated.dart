@@ -1,5 +1,5 @@
-// filepath: /Users/janikkahle/Documents/Development/Projekte/Mobile/mcbroken_app/lib/logic/blocs/home/home_state.dart
-part of 'home_bloc.dart';
+// filepath: /Users/janikkahle/Documents/Development/Projekte/Mobile/mcbroken_app/lib/logic/blocs/home/home_state_updated.dart
+part of 'home_bloc_updated.dart';
 
 /// Basisklasse für alle Zustände des HomeBloc
 ///

@@ -73,9 +73,9 @@ The mcbroken_app is a Flutter application that shows the status of McDonald's ic
 3. ✅ Add background data fetching with refresh policies
 
 ### Phase 2: Code Structure Improvements
-1. Refactor models and use json_serializable
-2. Implement proper dependency injection
-3. Improve error handling and add retry mechanisms
+1. ✅ Refactor models and use json_serializable
+2. ✅ Implement proper dependency injection
+3. ✅ Improve error handling and add retry mechanisms
 
 ### Phase 3: New Feature Implementation
 1. Add search functionality

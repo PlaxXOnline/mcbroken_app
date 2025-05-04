@@ -1,4 +1,4 @@
-// filepath: /Users/janikkahle/Documents/Development/Projekte/Mobile/mcbroken_app/lib/logic/blocs/home/home_bloc.dart
+// filepath: /Users/janikkahle/Documents/Development/Projekte/Mobile/mcbroken_app/lib/logic/blocs/home/home_bloc_updated.dart
 import 'dart:async';
 import 'dart:developer';
 
@@ -10,8 +10,8 @@ import 'package:mcbroken/logic/cubits/connectivity/internet_cubit.dart';
 import 'package:mcbroken/services/api/api_error_handler.dart';
 import 'package:meta/meta.dart';
 
-part 'home_event.dart';
-part 'home_state.dart';
+part 'home_event_updated.dart';
+part 'home_state_updated.dart';
 
 /// Bloc zur Verwaltung des Zustands der Startseite und der McDonald's-Standortdaten
 ///

@@ -1,3 +1,4 @@
+// filepath: /Users/janikkahle/Documents/Development/Projekte/Mobile/mcbroken_app/lib/presentation/screens/home_screen.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
@@ -9,16 +10,28 @@ import 'package:mcbroken/presentation/screens/settings_screen.dart';
 import 'package:mcbroken/presentation/widgets/map.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
+/// Hauptbildschirm der Anwendung
+///
+/// Zeigt die Karte mit den McDonald's-Standorten und den Status ihrer Eismaschinen an.
+/// Reagiert auf den Verbindungsstatus und den aktuellen HomeBloc-Zustand.
 class HomeScreen extends StatelessWidget {
+  /// Erstellt einen neuen HomeScreen
+  ///
+  /// [key] ist ein optionaler Schlüssel zur Identifikation dieses Widgets
   const HomeScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    // Native Splash Screen entfernen, sobald der Bildschirm aufgebaut ist
     FlutterNativeSplash.remove();
+    
+    // Lokalisierungsobjekt für übersetzte Texte
     final AppLocalizations locale = AppLocalizations.of(context)!;
+    
     return Scaffold(
       appBar: AppBar(
         actions: [
+          // Einstellungsschaltfläche
           IconButton(
             icon: const Icon(Icons.settings),
             onPressed: () {
@@ -43,23 +56,51 @@ class HomeScreen extends StatelessWidget {
           children: [
             Builder(
               builder: (blocContext) {
+                // Überwachen des Internetverbindungsstatus
                 var internetState = context.watch<InternetCubit>().state;
+                
+                // Wenn über WLAN oder Mobilfunk verbunden
                 if (internetState is InternetConnected &&
                         internetState.connectionType == ConnectionType.Wifi ||
                     internetState is InternetConnected &&
                         internetState.connectionType == ConnectionType.Mobile) {
+                  // Daten anfordern bei Verbindung
                   context.read<HomeBloc>().add(DataRequestEvent());
+                  
                   return Flexible(
                     child: Builder(
                       builder: ((context) {
+                        // Überwachen des HomeBloc-Zustands
                         final homeState = context.watch<HomeBloc>().state;
+                        
+                        // Je nach State passende UI anzeigen
                         if (homeState is HomeStateLoaded) {
                           return const McDonaldsMap();
+                        } else if (homeState is HomeStateNoLocation) {
+                          // Wenn Daten geladen wurden, aber keine Position verfügbar ist
+                          return const McDonaldsMap();
+                        } else if (homeState is HomeStateOffline) {
+                          // Bei Offline-Status mit verfügbaren Cache-Daten
+                          return Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                'Offline-Modus',
+                                style: Theme.of(context).textTheme.titleMedium,
+                              ),
+                              const SizedBox(height: 8),
+                              Text(homeState.message),
+                              const SizedBox(height: 16),
+                              const Expanded(child: McDonaldsMap()),
+                            ],
+                          );
                         } else if (homeState is HomeStateError) {
+                          // Bei Fehlern
                           return Center(
-                            child: Text(homeState.error),
+                            child: Text(homeState.message),
                           );
                         } else {
+                          // Ladeindikator für alle anderen Zustände
                           return const Center(
                             child: CircularProgressIndicator(),
                           );
@@ -68,14 +109,14 @@ class HomeScreen extends StatelessWidget {
                     ),
                   );
                 } else if (internetState is InternetDisconnected) {
+                  // Wenn keine Internetverbindung besteht
                   return Text(locale.noConnection);
                 }
+                
+                // Ladeindikator während die Verbindung geprüft wird
                 return const Center(child: CircularProgressIndicator());
               },
             ),
-            /* Divider(
-              height: 5,
-            ), */
           ],
         ),
       ),
