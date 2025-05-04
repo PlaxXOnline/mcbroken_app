@@ -3,9 +3,18 @@
 <plist version="1.0">
 	<dict>
 		<key>NSLocationWhenInUseUsageDescription</key>
-		<string>This app needs access to location when open.</string>
+		<string>This app needs access to location for defining the position.</string>
 		<key>NSLocationAlwaysUsageDescription</key>
 		<string>This app needs access to location when in the background.</string>
+		<!-- Erlaubnis für lokale Netzwerkzugriffe (Debugging) -->
+		<key>NSLocalNetworkUsageDescription</key>
+		<string>$(PRODUCT_NAME) benötigt Netzwerkzugriff zum Debuggen (Hot Reload, DevTools).</string>
+
+		<!-- Optional: Bonjour-Service angeben, den der Dart-VM-Service nutzt -->
+		<key>NSBonjourServices</key>
+		<array>
+		<string>_dartobservatory._tcp</string>
+		</array>
 		<key>CFBundleDevelopmentRegion</key>
 		<string>$(DEVELOPMENT_LANGUAGE)</string>
 		<key>CFBundleDisplayName</key>

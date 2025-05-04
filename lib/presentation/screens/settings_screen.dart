@@ -34,10 +34,10 @@ class SettingsScreen extends StatelessWidget {
     final Size size = MediaQuery.of(context).size;
     final HomeBloc homeBloc = context.read<HomeBloc>();
 
-    final List<Mcdonalds_model> workingList = homeBloc.mcDonaldsData
+    final List<Mcdonalds_model> workingList = homeBloc.allMcDonaldsData
         .where((element) => element.properties.is_broken == false)
         .toList();
-    final List<Mcdonalds_model> notWorkingList = homeBloc.mcDonaldsData
+    final List<Mcdonalds_model> notWorkingList = homeBloc.allMcDonaldsData
         .where((element) => element.properties.is_broken == true)
         .toList();
 
@@ -53,7 +53,7 @@ class SettingsScreen extends StatelessWidget {
                 tiles: [
                   SettingsTile(
                     title: Text(locale.iceMachineTotal),
-                    value: Text(homeBloc.mcDonaldsData.length.toString()),
+                    value: Text(homeBloc.allMcDonaldsData.length.toString()),
                   ),
                   SettingsTile(
                     title: Text(locale.iceMachineWorking),
