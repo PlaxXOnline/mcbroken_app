@@ -11,6 +11,7 @@ import 'package:mcbroken/services/api/api_client.dart';
 import 'package:mcbroken/services/api/api_error_handler.dart';
 import 'package:mcbroken/services/database/database_service.dart';
 import 'package:mcbroken/services/network/network_info.dart';
+import 'package:mcbroken/services/preferences/favorites_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// Globale GetIt Instanz für die Dependency Injection
@@ -48,6 +49,9 @@ Future<void> initDependencies() async {
     ),
   );
   serviceLocator.registerLazySingleton<DatabaseService>(() => DatabaseServiceImpl());
+  serviceLocator.registerLazySingleton<FavoritesService>(
+    () => FavoritesService(serviceLocator<SharedPreferences>()),
+  );
 
   // Repositories
   serviceLocator.registerLazySingleton<McDonaldsRepository>(
@@ -60,7 +64,11 @@ Future<void> initDependencies() async {
 
   // BLoCs und Cubits
   serviceLocator.registerFactory<HomeBloc>(
-    () => HomeBloc(repository: serviceLocator<McDonaldsRepository>()),
+    () => HomeBloc(
+      repository: serviceLocator<McDonaldsRepository>(),
+      favoritesService: serviceLocator<FavoritesService>(),
+      internetCubit: serviceLocator<InternetCubit>(),
+    ),
   );
   serviceLocator.registerFactory<InternetCubit>(
     () => InternetCubit(connectivity: serviceLocator<Connectivity>()),

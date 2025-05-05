@@ -15,5 +15,14 @@
   "showOnlyWorking": "Show only working",
   "showOnlyDefect": "Show only defect",
   "allowRotation": "Allow rotation",
-  "allowZoom": "Allow zoom"
+  "allowZoom": "Allow zoom",
+  "searchHint": "Search for location or address",
+  "filterTitle": "Filter",
+  "showAll": "Show all",
+  "favorites": "Favorites",
+  "addToFavorites": "Add to favorites",
+  "removeFromFavorites": "Remove from favorites",
+  "noResults": "No results found",
+  "apply": "Apply",
+  "cancel": "Cancel"
 }

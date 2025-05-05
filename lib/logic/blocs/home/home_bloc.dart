@@ -8,6 +8,7 @@ import 'package:mcbroken/data/models/mcdonalds_location.dart';
 import 'package:mcbroken/data/repository/mcdonalds_repository.dart';
 import 'package:mcbroken/logic/cubits/connectivity/internet_cubit.dart';
 import 'package:mcbroken/services/api/api_error_handler.dart';
+import 'package:mcbroken/services/preferences/favorites_service.dart';
 import 'package:meta/meta.dart';
 
 part 'home_event.dart';
@@ -16,14 +17,17 @@ part 'home_state.dart';
 /// Bloc zur Verwaltung des Zustands der Startseite und der McDonald's-Standortdaten
 ///
 /// Der HomeBloc ist verantwortlich für das Laden und Filtern von McDonald's-Standortdaten,
-/// die Überwachung des Verbindungsstatus und die Aktualisierung der UI entsprechend des
-/// aktuellen Datenstatus.
+/// die Überwachung des Verbindungsstatus, die Suche nach Standorten und 
+/// die Aktualisierung der UI entsprechend des aktuellen Datenstatus.
 class HomeBloc extends Bloc<HomeEvent, HomeState> {
   /// Repository für den Zugriff auf McDonald's-Daten
   final McDonaldsRepository _repository;
   
   /// InternetCubit zur Überwachung der Internetverbindung
   final InternetCubit? _internetCubit;
+  
+  /// Service zur Verwaltung der Favoriten
+  final FavoritesService _favoritesService;
   
   /// Subscription für Internetstatus-Updates
   StreamSubscription? _internetStreamSubscription;
@@ -40,6 +44,12 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   /// Filter-Flag, ob nur Standorte mit defekten Eismaschinen angezeigt werden sollen
   bool? _filterOnlyBroken;
   
+  /// Filter-Flag, ob nur Standorte mit funktionierenden Eismaschinen angezeigt werden sollen
+  bool? _filterOnlyWorking;
+  
+  /// Liste der favorisierten Standorte
+  List<String> _favorites = [];
+  
   /// Zeitpunkt der letzten Aktualisierung der Daten
   DateTime? _lastUpdated;
 
@@ -47,10 +57,13 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   ///
   /// [repository] ist das Repository, das für den Zugriff auf die Daten verwendet wird.
   /// [internetCubit] ist optional und wird für die Überwachung des Netzwerkstatus verwendet.
+  /// [favoritesService] ist der Service zur Verwaltung der Favoriten.
   HomeBloc({
     required McDonaldsRepository repository,
+    required FavoritesService favoritesService,
     InternetCubit? internetCubit,
   }) : _repository = repository,
+       _favoritesService = favoritesService,
        _internetCubit = internetCubit,
        super(HomeStateInitial()) {
     log("HomeBloc initializing...");
@@ -77,6 +90,15 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     // Event zum Suchen von Standorten
     on<SearchLocationsEvent>(_onSearchLocations);
     
+    // Event zum Zurücksetzen der Suche
+    on<ResetSearchEvent>(_onResetSearch);
+    
+    // Event zum Hinzufügen eines Standorts zu Favoriten
+    on<AddToFavoritesEvent>(_onAddToFavorites);
+    
+    // Event zum Entfernen eines Standorts aus Favoriten
+    on<RemoveFromFavoritesEvent>(_onRemoveFromFavorites);
+    
     // Event zum Laden von Standorten in einem Kartenbereich
     on<LoadLocationsInViewEvent>(_onLoadLocationsInView);
   }
@@ -91,6 +113,9 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   ) async {
     try {
       emit(HomeStateLoading());
+      
+      // Favoriten laden
+      _favorites = await _favoritesService.loadFavorites();
       
       // Position bestimmen, falls möglich
       try {
@@ -109,6 +134,9 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       
       // Filter anwenden
       _applyFiltering();
+      
+      // Länderstatistik loggen
+      logCountryStatistics();
       
       // State aktualisieren
       if (_currentPosition != null) {
@@ -216,27 +244,51 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   ) async {
     // Filter speichern
     _filterOnlyBroken = event.onlyBroken;
+    _filterOnlyWorking = event.onlyWorking;
+    bool onlyFavorites = event.onlyFavorites;
     
     // Filterung anwenden
-    _applyFiltering();
+    if (_filterOnlyBroken != null && _filterOnlyWorking != null) {
+      // Beide Filter können nicht gleichzeitig aktiv sein
+      if (_filterOnlyBroken!) {
+        _filterOnlyWorking = false;
+      } else if (_filterOnlyWorking!) {
+        _filterOnlyBroken = false;
+      }
+    }
+    
+    // Filterung anwenden
+    _applyFiltering(onlyWorking: _filterOnlyWorking, onlyFavorites: onlyFavorites);
     
     // State aktualisieren, wenn wir bereits geladen haben
     final currentState = state;
     
     if (currentState is HomeStateLoaded) {
+      final favoritesList = currentState.favorites;
+      final searchQ = currentState.searchQuery;
+      
       emit(HomeStateLoaded(
         _filteredMcDonaldsData, 
         currentState.position,
-        filtered: _filterOnlyBroken != null,
+        filtered: _filterOnlyBroken != null || _filterOnlyWorking != null,
         showOnlyBroken: _filterOnlyBroken,
+        showOnlyWorking: _filterOnlyWorking,
         lastUpdated: _lastUpdated,
+        searchQuery: searchQ,
+        favorites: favoritesList,
       ));
     } else if (currentState is HomeStateNoLocation) {
+      final favoritesList = currentState.favorites;
+      final searchQ = currentState.searchQuery;
+      
       emit(HomeStateNoLocation(
         _filteredMcDonaldsData,
-        filtered: _filterOnlyBroken != null,
+        filtered: _filterOnlyBroken != null || _filterOnlyWorking != null,
         showOnlyBroken: _filterOnlyBroken,
+        showOnlyWorking: _filterOnlyWorking,
         lastUpdated: _lastUpdated,
+        searchQuery: searchQ,
+        favorites: favoritesList,
       ));
     } else if (currentState is HomeStateOffline) {
       emit(HomeStateOffline(
@@ -259,27 +311,42 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     try {
       emit(HomeStateLoading());
       
-      // Suche durchführen
+      // Suche durchführen, nur wenn Suchbegriff nicht leer ist
+      if (event.query.trim().isEmpty) {
+        add(ResetSearchEvent());
+        return;
+      }
+      
       final searchResults = await _repository.searchLocations(event.query);
       _filteredMcDonaldsData = searchResults;
       
       // State aktualisieren
       if (_currentPosition != null) {
+        final currentState = state is HomeStateLoaded ? state as HomeStateLoaded : null;
+        final favoritesList = currentState?.favorites ?? [];
+        
         emit(HomeStateLoaded(
           _filteredMcDonaldsData, 
           _currentPosition!,
           filtered: true, // Die Ergebnisse sind durch die Suche gefiltert
           showOnlyBroken: _filterOnlyBroken,
+          showOnlyWorking: null,
           lastUpdated: _lastUpdated,
           searchQuery: event.query,
+          favorites: favoritesList,
         ));
       } else {
+        final currentState = state is HomeStateNoLocation ? state as HomeStateNoLocation : null;
+        final favoritesList = currentState?.favorites ?? [];
+        
         emit(HomeStateNoLocation(
           _filteredMcDonaldsData,
           filtered: true, // Die Ergebnisse sind durch die Suche gefiltert
           showOnlyBroken: _filterOnlyBroken,
+          showOnlyWorking: null,
           lastUpdated: _lastUpdated,
           searchQuery: event.query,
+          favorites: favoritesList,
         ));
       }
     } catch (e) {
@@ -360,13 +427,30 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   ///
   /// Aktualisiert die _filteredMcDonaldsData-Liste basierend auf dem
   /// aktuellen _filterOnlyBroken-Wert
-  void _applyFiltering() {
+  void _applyFiltering({bool? onlyWorking, bool onlyFavorites = false}) {
+    _filteredMcDonaldsData = List.from(_allMcDonaldsData);
+    
+    // Filter nach Status der Eismaschine
     if (_filterOnlyBroken != null) {
-      _filteredMcDonaldsData = _allMcDonaldsData
+      // Nur defekte anzeigen
+      _filteredMcDonaldsData = _filteredMcDonaldsData
           .where((location) => location.properties.isBroken == _filterOnlyBroken)
           .toList();
-    } else {
-      _filteredMcDonaldsData = List.from(_allMcDonaldsData);
+    } else if (onlyWorking != null && onlyWorking) {
+      // Nur funktionierende anzeigen
+      _filteredMcDonaldsData = _filteredMcDonaldsData
+          .where((location) => location.properties.isBroken == false)
+          .toList();
+    }
+    
+    // Filter nach Favoriten
+    if (onlyFavorites && _favorites.isNotEmpty) {
+      _filteredMcDonaldsData = _filteredMcDonaldsData
+          .where((location) {
+            final String locationId = '${location.geometry.coordinates[0]}_${location.geometry.coordinates[1]}';
+            return _favorites.contains(locationId);
+          })
+          .toList();
     }
   }
 
@@ -406,6 +490,151 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     return await Geolocator.getCurrentPosition();
   }
   
+  /// Verarbeitet ein Zurücksetzen der Suche
+  ///
+  /// [event] enthält die Parameter für das Event
+  /// [emit] wird verwendet, um neue Zustände zu emittieren
+  Future<void> _onResetSearch(
+    ResetSearchEvent event,
+    Emitter<HomeState> emit
+  ) async {
+    try {
+      if (state is HomeStateLoaded) {
+        final currentState = state as HomeStateLoaded;
+
+        // Filter aufheben und alle Daten anzeigen
+        emit(currentState.copyWith(
+          mcdonalds_data: _allMcDonaldsData, 
+          searchQuery: null,
+        ));
+      }
+    } catch (e) {
+      log("Fehler beim Zurücksetzen der Suche: $e");
+    }
+  }
+  
+  /// Verarbeitet das Hinzufügen eines Standorts zu Favoriten
+  ///
+  /// [event] enthält die Parameter für das Event
+  /// [emit] wird verwendet, um neue Zustände zu emittieren
+  Future<void> _onAddToFavorites(
+    AddToFavoritesEvent event,
+    Emitter<HomeState> emit
+  ) async {
+    try {
+      if (state is HomeStateLoaded) {
+        final currentState = state as HomeStateLoaded;
+        
+        // Prüfen, ob der Standort bereits als Favorit markiert ist
+        if (!currentState.favorites.contains(event.locationId)) {
+          // Favoriten-Liste aktualisieren und persistieren
+          _favorites = await _favoritesService.addFavorite(event.locationId);
+          
+          // Neuen Zustand emittieren
+          emit(currentState.copyWith(favorites: _favorites));
+        }
+      } else if (state is HomeStateNoLocation) {
+        final currentState = state as HomeStateNoLocation;
+        
+        // Favoriten-Liste aktualisieren und persistieren
+        _favorites = await _favoritesService.addFavorite(event.locationId);
+        
+        // Neuen Zustand emittieren
+        emit(HomeStateNoLocation(
+          currentState.mcdonalds_data,
+          filtered: currentState.filtered,
+          showOnlyBroken: currentState.showOnlyBroken,
+          showOnlyWorking: currentState.showOnlyWorking,
+          lastUpdated: currentState.lastUpdated,
+          searchQuery: currentState.searchQuery,
+          favorites: _favorites,
+        ));
+      }
+    } catch (e) {
+      log("Fehler beim Hinzufügen zu Favoriten: $e");
+    }
+  }
+  
+  /// Verarbeitet das Entfernen eines Standorts aus Favoriten
+  ///
+  /// [event] enthält die Parameter für das Event
+  /// [emit] wird verwendet, um neue Zustände zu emittieren
+  Future<void> _onRemoveFromFavorites(
+    RemoveFromFavoritesEvent event,
+    Emitter<HomeState> emit
+  ) async {
+    try {
+      if (state is HomeStateLoaded) {
+        final currentState = state as HomeStateLoaded;
+        
+        // Favoriten-Liste aktualisieren und persistieren
+        _favorites = await _favoritesService.removeFavorite(event.locationId);
+        
+        // Neuen Zustand emittieren
+        emit(currentState.copyWith(favorites: _favorites));
+      } else if (state is HomeStateNoLocation) {
+        final currentState = state as HomeStateNoLocation;
+        
+        // Favoriten-Liste aktualisieren und persistieren
+        _favorites = await _favoritesService.removeFavorite(event.locationId);
+        
+        // Neuen Zustand emittieren
+        emit(HomeStateNoLocation(
+          currentState.mcdonalds_data,
+          filtered: currentState.filtered,
+          showOnlyBroken: currentState.showOnlyBroken,
+          showOnlyWorking: currentState.showOnlyWorking,
+          lastUpdated: currentState.lastUpdated,
+          searchQuery: currentState.searchQuery,
+          favorites: _favorites,
+        ));
+      }
+    } catch (e) {
+      log("Fehler beim Entfernen aus Favoriten: $e");
+    }
+  }
+
+  /// Analysiert die McDonaldsLocation-Daten und gibt eine Zusammenfassung der Länderverteilung aus
+  ///
+  /// Diese Methode zählt die verschiedenen Länder und gibt eine Zusammenfassung im Log aus.
+  void logCountryStatistics() {
+    if (_allMcDonaldsData.isEmpty) {
+      log("Keine McDonaldsLocation-Daten verfügbar für die Länderanalyse.");
+      return;
+    }
+
+    // Zähle die Anzahl der Standorte pro Land
+    final Map<String, int> countryCounts = {};
+    
+    for (var location in _allMcDonaldsData) {
+      final country = location.properties.country;
+      
+      // Überspringe leere Länderbezeichnungen
+      if (country.isEmpty) continue;
+      
+      // Zähler für das Land erhöhen oder initialisieren
+      countryCounts[country] = (countryCounts[country] ?? 0) + 1;
+    }
+
+    // Sortiere die Länder nach Anzahl der Standorte (absteigend)
+    final sortedCountries = countryCounts.entries.toList()
+      ..sort((a, b) => b.value.compareTo(a.value));
+    
+    // Logge eine Zusammenfassung
+    final int totalCountries = countryCounts.length;
+    final int totalLocations = _allMcDonaldsData.length;
+    
+    log("===== LÄNDERSTATISTIK =====");
+    log("Standorte aus $totalCountries verschiedenen Ländern gefunden (gesamt: $totalLocations)");
+    
+    for (var entry in sortedCountries) {
+      final percentage = (entry.value / totalLocations * 100).toStringAsFixed(1);
+      log("${entry.key}: ${entry.value} Standorte ($percentage%)");
+    }
+    
+    log("==========================");
+  }
+
   /// Bereinigt Ressourcen beim Schließen des Bloc
   ///
   /// Stellt sicher, dass alle StreamSubscriptions abgemeldet werden

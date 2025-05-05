@@ -34,11 +34,17 @@ class HomeStateLoaded extends HomeState {
   /// Flag, ob nur defekte Standorte angezeigt werden (null = alle anzeigen)
   final bool? showOnlyBroken;
   
+  /// Flag, ob nur funktionierende Standorte angezeigt werden (null = alle anzeigen)
+  final bool? showOnlyWorking;
+  
   /// Zeitpunkt der letzten Aktualisierung der Daten
   final DateTime? lastUpdated;
   
   /// Aktueller Suchbegriff, falls eine Suche aktiv ist
   final String? searchQuery;
+  
+  /// Liste der favorisierten Standort-IDs
+  final List<String> favorites;
 
   /// Erstellt einen neuen HomeStateLoaded
   ///
@@ -53,8 +59,10 @@ class HomeStateLoaded extends HomeState {
     this.position, {
     this.filtered = false,
     this.showOnlyBroken,
+    this.showOnlyWorking,
     this.lastUpdated,
     this.searchQuery,
+    this.favorites = const [],
   });
   
   /// Erstellt eine Kopie dieses Zustands mit möglicherweise aktualisierten Werten
@@ -65,16 +73,20 @@ class HomeStateLoaded extends HomeState {
     Position? position,
     bool? filtered,
     bool? showOnlyBroken,
+    bool? showOnlyWorking,
     DateTime? lastUpdated,
     String? searchQuery,
+    List<String>? favorites,
   }) {
     return HomeStateLoaded(
       mcdonalds_data ?? this.mcdonalds_data,
       position ?? this.position,
       filtered: filtered ?? this.filtered,
       showOnlyBroken: showOnlyBroken ?? this.showOnlyBroken,
+      showOnlyWorking: showOnlyWorking ?? this.showOnlyWorking,
       lastUpdated: lastUpdated ?? this.lastUpdated,
       searchQuery: searchQuery ?? this.searchQuery,
+      favorites: favorites ?? this.favorites,
     );
   }
 }
@@ -93,25 +105,35 @@ class HomeStateNoLocation extends HomeState {
   /// Flag, ob nur defekte Standorte angezeigt werden (null = alle anzeigen)
   final bool? showOnlyBroken;
   
+  /// Flag, ob nur funktionierende Standorte angezeigt werden (null = alle anzeigen)
+  final bool? showOnlyWorking;
+  
   /// Zeitpunkt der letzten Aktualisierung der Daten
   final DateTime? lastUpdated;
   
   /// Aktueller Suchbegriff, falls eine Suche aktiv ist
   final String? searchQuery;
+  
+  /// Liste der favorisierten Standort-IDs
+  final List<String> favorites;
 
   /// Erstellt einen neuen HomeStateNoLocation
   ///
   /// [mcdonalds_data] ist die Liste der anzuzeigenden McDonald's-Standorte.
   /// [filtered] gibt an, ob die Daten gefiltert wurden.
   /// [showOnlyBroken] gibt an, ob nur defekte Standorte angezeigt werden.
+  /// [showOnlyWorking] gibt an, ob nur funktionierende Standorte angezeigt werden.
   /// [lastUpdated] ist der Zeitpunkt der letzten Datenaktualisierung.
   /// [searchQuery] ist der aktuelle Suchbegriff, falls eine Suche aktiv ist.
+  /// [favorites] ist die Liste der favorisierten Standort-IDs.
   HomeStateNoLocation(
     this.mcdonalds_data, {
     this.filtered = false,
     this.showOnlyBroken,
+    this.showOnlyWorking,
     this.lastUpdated,
     this.searchQuery,
+    this.favorites = const [],
   });
 }
 

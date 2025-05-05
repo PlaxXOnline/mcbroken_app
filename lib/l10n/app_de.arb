@@ -15,5 +15,14 @@
   "showOnlyWorking": "Nur funktionierende anzeigen",
   "showOnlyDefect": "Nur defekte anzeigen",
   "allowRotation": "Rotieren erlauben",
-  "allowZoom": "Zoom erlauben"
+  "allowZoom": "Zoom erlauben",
+  "searchHint": "Nach Standort oder Adresse suchen",
+  "filterTitle": "Filter",
+  "showAll": "Alle anzeigen",
+  "favorites": "Favoriten",
+  "addToFavorites": "Zu Favoriten hinzufügen",
+  "removeFromFavorites": "Aus Favoriten entfernen",
+  "noResults": "Keine Ergebnisse gefunden",
+  "apply": "Anwenden",
+  "cancel": "Abbrechen"
 }

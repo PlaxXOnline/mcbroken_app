@@ -29,29 +29,68 @@ class RefreshDataEvent extends HomeEvent {}
 
 /// Event zum Filtern von Standorten
 ///
-/// Wird ausgelöst, wenn der Benutzer die Filtereinstellungen ändert.
+/// Wird ausgelöst, wenn der Benutzer nach Standorten basierend auf den Status der Eismaschine filtert.
 class FilterLocationsEvent extends HomeEvent {
-  /// Flag, ob nur defekte Standorte angezeigt werden sollen
+  /// Flag, ob nur defekte Eismaschinen angezeigt werden sollen
   final bool? onlyBroken;
+  
+  /// Flag, ob nur funktionierende Eismaschinen angezeigt werden sollen
+  final bool? onlyWorking;
+  
+  /// Flag, ob nur favorisierte Standorte angezeigt werden sollen
+  final bool onlyFavorites;
   
   /// Erstellt ein neues FilterLocationsEvent
   ///
-  /// [onlyBroken] bestimmt, ob nur defekte Standorte angezeigt werden sollen.
-  /// Wenn null, werden alle Standorte angezeigt.
-  FilterLocationsEvent({this.onlyBroken});
+  /// [onlyBroken] bestimmt, ob nur Standorte mit defekten Eismaschinen angezeigt werden sollen.
+  /// [onlyWorking] bestimmt, ob nur Standorte mit funktionierenden Eismaschinen angezeigt werden sollen.
+  /// [onlyFavorites] bestimmt, ob nur favorisierte Standorte angezeigt werden sollen.
+  FilterLocationsEvent({this.onlyBroken, this.onlyWorking, this.onlyFavorites = false});
 }
 
-/// Event zum Suchen von Standorten
+/// Event zum Suchen nach Standorten
 ///
-/// Wird ausgelöst, wenn der Benutzer nach einem bestimmten Standort sucht.
+/// Wird ausgelöst, wenn der Benutzer nach bestimmten Standorten sucht.
 class SearchLocationsEvent extends HomeEvent {
-  /// Der Suchbegriff
+  /// Der Suchbegriff, nach dem gefiltert werden soll
   final String query;
   
   /// Erstellt ein neues SearchLocationsEvent
   ///
-  /// [query] ist der Suchbegriff, der auf Standorte angewendet werden soll.
-  SearchLocationsEvent(this.query);
+  /// [query] ist der Suchbegriff, nach dem gesucht werden soll.
+  /// Die Suche umfasst Straße, Stadt, Bundesland und Land.
+  SearchLocationsEvent({required this.query});
+}
+
+/// Event zum Zurücksetzen der Suche
+///
+/// Wird ausgelöst, wenn der Benutzer die Suche zurücksetzt oder das Suchfeld leert.
+class ResetSearchEvent extends HomeEvent {}
+
+/// Event zum Hinzufügen eines Standorts zu Favoriten
+///
+/// Wird ausgelöst, wenn der Benutzer einen Standort zu seinen Favoriten hinzufügt.
+class AddToFavoritesEvent extends HomeEvent {
+  /// Die ID des Standorts, der zu Favoriten hinzugefügt werden soll
+  final String locationId;
+  
+  /// Erstellt ein neues AddToFavoritesEvent
+  ///
+  /// [locationId] ist die eindeutige ID des Standorts, der als Favorit markiert werden soll.
+  AddToFavoritesEvent({required this.locationId});
+}
+
+/// Event zum Entfernen eines Standorts aus Favoriten
+///
+/// Wird ausgelöst, wenn der Benutzer einen Standort aus seinen Favoriten entfernt.
+class RemoveFromFavoritesEvent extends HomeEvent {
+  /// Die ID des Standorts, der aus Favoriten entfernt werden soll
+  final String locationId;
+  
+  /// Erstellt ein neues RemoveFromFavoritesEvent
+  ///
+  /// [locationId] ist die eindeutige ID des Standorts, der aus Favoriten entfernt werden soll.
+  RemoveFromFavoritesEvent({required this.locationId});
 }
 
 /// Event zum Laden von Standorten in einem bestimmten Kartenbereich
