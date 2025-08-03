@@ -88,8 +88,7 @@ class McDonaldsRepositoryImpl implements McDonaldsRepository {
       try {
         await refreshData();
       } catch (e) {
-        // Fehler beim Aktualisieren der Daten, verwende lokale Daten
-        print('Fehler beim Aktualisieren der Daten: $e');
+        // Fehler beim Aktualisieren der Daten, verwende lokale Daten stillschweigend
       }
     }
     
@@ -116,8 +115,7 @@ class McDonaldsRepositoryImpl implements McDonaldsRepository {
       try {
         await refreshData();
       } catch (e) {
-        // Fehler beim Aktualisieren der Daten, verwende lokale Daten
-        print('Fehler beim Aktualisieren der Daten: $e');
+        // Fehler beim Aktualisieren der Daten, verwende lokale Daten stillschweigend
       }
     }
     
@@ -137,13 +135,31 @@ class McDonaldsRepositoryImpl implements McDonaldsRepository {
   /// Gibt eine Liste von Standorten zurück, die dem Suchbegriff entsprechen
   @override
   Future<List<McDonaldsLocation>> searchLocations(String query) async {
+    try {
+      // Timeout für die gesamte Suchoperation (10 Sekunden)
+      final searchOperation = _performSearch(query);
+      return await searchOperation.timeout(
+        const Duration(seconds: 10),
+        onTimeout: () => <McDonaldsLocation>[],
+      );
+    } catch (e) {
+      // Bei Fehlern eine leere Liste zurückgeben
+      return [];
+    }
+  }
+
+  /// Führt die eigentliche Suchoperation durch
+  ///
+  /// [query] ist der Suchbegriff
+  /// 
+  /// Gibt eine Liste von Standorten zurück, die dem Suchbegriff entsprechen
+  Future<List<McDonaldsLocation>> _performSearch(String query) async {
     // Stellt sicher, dass aktuelle Daten vorhanden sind
     if (await _shouldRefreshData()) {
       try {
         await refreshData();
       } catch (e) {
-        // Fehler beim Aktualisieren der Daten, verwende lokale Daten
-        print('Fehler beim Aktualisieren der Daten: $e');
+        // Fehler beim Aktualisieren der Daten, verwende lokale Daten stillschweigend
       }
     }
     
@@ -271,7 +287,6 @@ class McDonaldsRepositoryImpl implements McDonaldsRepository {
           results.add(location);
         }
       } catch (e) {
-        print('Fehler beim Parsen eines Standorts: $e');
         // Überspringe den fehlerhaften Eintrag, fange aber nicht den gesamten Prozess ab
         continue;
       }
@@ -307,16 +322,14 @@ class McDonaldsRepositoryImpl implements McDonaldsRepository {
             try {
               safeCoordinates.add(double.parse(coord));
             } catch (e) {
-              print('Fehler beim Parsen der Koordinate "$coord": $e');
-              safeCoordinates.add(0.0); // Fallback-Wert
+              safeCoordinates.add(0.0); // Fallback-Wert bei Parse-Fehler
             }
           } else if (coord is double) {
             safeCoordinates.add(coord);
           } else if (coord is int) {
             safeCoordinates.add(coord.toDouble());
           } else {
-            print('Unbekannter Koordinatentyp: ${coord.runtimeType}');
-            safeCoordinates.add(0.0); // Fallback-Wert
+            safeCoordinates.add(0.0); // Fallback-Wert für unbekannte Typen
           }
         }
         
@@ -353,7 +366,7 @@ class McDonaldsRepositoryImpl implements McDonaldsRepository {
     try {
       return McDonaldsLocation.fromJson(rawLocation);
     } catch (e) {
-      print('Fehler bei der Deserialisierung des Standorts: $e');
+      // Fehler stillschweigend ignorieren für Produktionsumgebung
       
       // Fallback: Ein minimales Objekt zurückgeben
       return McDonaldsLocation(

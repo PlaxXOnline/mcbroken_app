@@ -25,7 +25,7 @@ dependencies:
   latlong2: ^0.9.0
   flutter_map_marker_cluster_plus: ^1.4.2
   geolocator: ^14.0.0
-  intl: ^0.19.0
+  intl: ^0.20.2
   flutter_native_splash: ^2.2.16
   google_fonts: ^6.1.0
   flutter_map_location_marker: ^10.1.0
@@ -38,7 +38,7 @@ dependencies:
   shared_preferences: ^2.5.3
   flutter_cache_manager: ^3.3.1
   json_serializable: ^6.7.1
-  build_runner: ^2.4.6
+  #build_runner: ^2.4.6
   json_annotation: ^4.8.1
   flutter_background_service: ^5.0.5
   flutter_background_service_android: ^6.2.2

@@ -50,7 +50,10 @@ Future<void> initDependencies() async {
   );
   serviceLocator.registerLazySingleton<DatabaseService>(() => DatabaseServiceImpl());
   serviceLocator.registerLazySingleton<FavoritesService>(
-    () => FavoritesService(serviceLocator<SharedPreferences>()),
+    () => FavoritesService(
+      serviceLocator<SharedPreferences>(),
+      serviceLocator<DatabaseService>(),
+    ),
   );
 
   // Repositories

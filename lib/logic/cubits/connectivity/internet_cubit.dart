@@ -18,7 +18,6 @@ class InternetCubit extends Cubit<InternetState> {
   StreamSubscription<ConnectivityResult> monitorInternetConnection() {
     return connectivityStreamSubscription =
         connectivity.onConnectivityChanged.listen((connectivityResult) async {
-      print(connectivityResult);
 
       if (connectivityResult == ConnectivityResult.wifi) {
         emitInternetConnected(ConnectionType.Wifi);

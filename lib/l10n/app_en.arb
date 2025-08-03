@@ -23,6 +23,8 @@
   "addToFavorites": "Add to favorites",
   "removeFromFavorites": "Remove from favorites",
   "noResults": "No results found",
+  "noSearchResults": "No search results found for your query",
+  "resetSearch": "Reset search",
   "apply": "Apply",
   "cancel": "Cancel"
 }

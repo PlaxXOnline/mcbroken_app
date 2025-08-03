@@ -66,6 +66,37 @@ abstract class DatabaseService {
   ///
   /// Diese Methode sollte aufgerufen werden, wenn die Datenbank nicht mehr benötigt wird.
   Future<void> close();
+
+  /// Fügt einen Standort zu den Favoriten hinzu
+  ///
+  /// [locationId] ist die eindeutige ID des Standorts
+  ///
+  /// Gibt true zurück, wenn das Hinzufügen erfolgreich war
+  Future<bool> addFavorite(String locationId);
+
+  /// Entfernt einen Standort aus den Favoriten
+  ///
+  /// [locationId] ist die eindeutige ID des Standorts
+  ///
+  /// Gibt true zurück, wenn das Entfernen erfolgreich war
+  Future<bool> removeFavorite(String locationId);
+
+  /// Holt alle favorisierten Standort-IDs
+  ///
+  /// Gibt eine Liste aller favorisierten Standort-IDs zurück
+  Future<List<String>> getAllFavorites();
+
+  /// Prüft, ob ein Standort als Favorit markiert ist
+  ///
+  /// [locationId] ist die eindeutige ID des Standorts
+  ///
+  /// Gibt true zurück, wenn der Standort favorisiert ist
+  Future<bool> isFavorite(String locationId);
+
+  /// Holt alle favorisierten McDonald's-Standorte
+  ///
+  /// Gibt eine Liste aller favorisierten Standorte zurück
+  Future<List<McDonaldsLocation>> getFavoriteLocations();
 }
 
 /// Implementierung des [DatabaseService] mit SQLite
@@ -77,6 +108,7 @@ class DatabaseServiceImpl implements DatabaseService {
   
   static const String _tableLocations = 'locations';
   static const String _tableSettings = 'settings';
+  static const String _tableFavorites = 'favorites';
   
   Database? _db;
 
@@ -124,6 +156,19 @@ class DatabaseServiceImpl implements DatabaseService {
         value TEXT NOT NULL
       )
     ''');
+
+    // Tabelle für Favoriten
+    await db.execute('''
+      CREATE TABLE $_tableFavorites (
+        location_id TEXT PRIMARY KEY,
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+      )
+    ''');
+
+    // Indizes für bessere Performance
+    await db.execute('CREATE INDEX idx_locations_coords ON $_tableLocations(latitude, longitude)');
+    await db.execute('CREATE INDEX idx_locations_broken ON $_tableLocations(is_broken)');
+    await db.execute('CREATE INDEX idx_locations_city ON $_tableLocations(city)');
   }
 
   /// Aktualisiert die Datenbankstruktur bei einer Version-Änderung
@@ -162,17 +207,17 @@ class DatabaseServiceImpl implements DatabaseService {
             'longitude': coordinates[0],
             'is_broken': location.properties.isBroken ? 1 : 0,
             'is_active': location.properties.isActive ? 1 : 0,
-            'state': location.properties.state ?? '',
-            'city': location.properties.city ?? '',
-            'street': location.properties.street ?? '',
-            'country': location.properties.country ?? '',
-            'last_checked': location.properties.lastChecked ?? '',
+            'state': location.properties.state,
+            'city': location.properties.city,
+            'street': location.properties.street,
+            'country': location.properties.country,
+            'last_checked': location.properties.lastChecked,
             'json_data': jsonDataString, // Als String gespeichert
           },
           conflictAlgorithm: ConflictAlgorithm.replace,
         );
       } catch (e) {
-        print('Fehler beim Speichern eines Standorts: $e');
+        // Fehler stillschweigend ignorieren für Produktionsumgebung
         continue;
       }
     }
@@ -224,13 +269,38 @@ class DatabaseServiceImpl implements DatabaseService {
   Future<List<McDonaldsLocation>> searchLocations(String query) async {
     if (_db == null) await init();
     
-    final searchTerm = '%${query.toLowerCase()}%';
+    // Query in Kleinbuchstaben für case-insensitive Suche umwandeln
+    final String normalizedQuery = query.toLowerCase().trim();
     
-    final records = await _db!.query(
-      _tableLocations,
-      where: 'LOWER(city) LIKE ? OR LOWER(street) LIKE ? OR LOWER(state) LIKE ?',
-      whereArgs: [searchTerm, searchTerm, searchTerm],
-    );
+    // Spezifische Suchbegriffe für verschiedene Arten von Übereinstimmungen
+    final exactTerm = normalizedQuery;
+    final startsTerm = '$normalizedQuery%';
+    final containsTerm = '%$normalizedQuery%';
+    
+    // Optimierte SQL-Abfrage mit Gewichtung der Treffer
+    final records = await _db!.rawQuery('''
+      SELECT * FROM $_tableLocations 
+      WHERE 
+        LOWER(city) LIKE ? OR 
+        LOWER(street) LIKE ? OR 
+        LOWER(state) LIKE ? OR 
+        LOWER(country) LIKE ?
+      ORDER BY
+        CASE 
+          WHEN LOWER(city) = ? THEN 1
+          WHEN LOWER(street) = ? THEN 2
+          WHEN LOWER(city) LIKE ? THEN 3
+          WHEN LOWER(street) LIKE ? THEN 4
+          WHEN LOWER(state) = ? THEN 5
+          WHEN LOWER(country) = ? THEN 6
+          ELSE 7
+        END,
+        LENGTH(city) ASC
+      LIMIT 50
+    ''', [
+      containsTerm, containsTerm, containsTerm, containsTerm,  // WHERE-Bedingungen
+      exactTerm, exactTerm, startsTerm, startsTerm, exactTerm, exactTerm  // ORDER BY-Bedingungen
+    ]);
     
     return _mapToLocations(records);
   }
@@ -291,6 +361,119 @@ class DatabaseServiceImpl implements DatabaseService {
       _db = null;
     }
   }
+
+  /// Fügt einen Standort zu den Favoriten hinzu
+  ///
+  /// [locationId] ist die eindeutige ID des Standorts
+  ///
+  /// Gibt true zurück, wenn das Hinzufügen erfolgreich war
+  @override
+  Future<bool> addFavorite(String locationId) async {
+    if (_db == null) await init();
+    
+    try {
+      await _db!.insert(
+        _tableFavorites,
+        {
+          'location_id': locationId,
+          'created_at': DateTime.now().toIso8601String(),
+        },
+        conflictAlgorithm: ConflictAlgorithm.ignore,
+      );
+      return true;
+    } catch (e) {
+      // Fehler stillschweigend ignorieren für Produktionsumgebung
+      return false;
+    }
+  }
+
+  /// Entfernt einen Standort aus den Favoriten
+  ///
+  /// [locationId] ist die eindeutige ID des Standorts
+  ///
+  /// Gibt true zurück, wenn das Entfernen erfolgreich war
+  @override
+  Future<bool> removeFavorite(String locationId) async {
+    if (_db == null) await init();
+    
+    try {
+      final rowsAffected = await _db!.delete(
+        _tableFavorites,
+        where: 'location_id = ?',
+        whereArgs: [locationId],
+      );
+      return rowsAffected > 0;
+    } catch (e) {
+      // Fehler stillschweigend ignorieren für Produktionsumgebung
+      return false;
+    }
+  }
+
+  /// Holt alle favorisierten Standort-IDs
+  ///
+  /// Gibt eine Liste aller favorisierten Standort-IDs zurück
+  @override
+  Future<List<String>> getAllFavorites() async {
+    if (_db == null) await init();
+    
+    try {
+      final records = await _db!.query(
+        _tableFavorites,
+        columns: ['location_id'],
+        orderBy: 'created_at DESC',
+      );
+      
+      return records.map((record) => record['location_id'] as String).toList();
+    } catch (e) {
+      // Fehler stillschweigend ignorieren für Produktionsumgebung
+      return [];
+    }
+  }
+
+  /// Prüft, ob ein Standort als Favorit markiert ist
+  ///
+  /// [locationId] ist die eindeutige ID des Standorts
+  ///
+  /// Gibt true zurück, wenn der Standort favorisiert ist
+  @override
+  Future<bool> isFavorite(String locationId) async {
+    if (_db == null) await init();
+    
+    try {
+      final records = await _db!.query(
+        _tableFavorites,
+        where: 'location_id = ?',
+        whereArgs: [locationId],
+        limit: 1,
+      );
+      
+      return records.isNotEmpty;
+    } catch (e) {
+      // Fehler stillschweigend ignorieren für Produktionsumgebung
+      return false;
+    }
+  }
+
+  /// Holt alle favorisierten McDonald's-Standorte
+  ///
+  /// Gibt eine Liste aller favorisierten Standorte zurück
+  @override
+  Future<List<McDonaldsLocation>> getFavoriteLocations() async {
+    if (_db == null) await init();
+    
+    try {
+      final records = await _db!.rawQuery('''
+        SELECT l.* FROM $_tableLocations l
+        INNER JOIN $_tableFavorites f ON l.id = f.location_id
+        ORDER BY f.created_at DESC
+      ''');
+      
+      return _mapToLocations(records);
+    } catch (e) {
+      // Fehler stillschweigend ignorieren für Produktionsumgebung
+      return [];
+    }
+  }
   
   /// Konvertiert Datenbankeinträge in [McDonaldsLocation]-Objekte
   ///
@@ -307,7 +490,7 @@ class DatabaseServiceImpl implements DatabaseService {
         // McDonaldsLocation aus dem geparsten JSON erstellen
         return McDonaldsLocation.fromJson(jsonData);
       } catch (e) {
-        print('Fehler beim Parsen der Standortdaten: $e');
+        // Fehler stillschweigend ignorieren für Produktionsumgebung
         
         // Fallback: Manuelle Erstellung des Objekts aus den Einzelfeldern
         try {
@@ -339,7 +522,7 @@ class DatabaseServiceImpl implements DatabaseService {
             type: 'Feature',
           );
         } catch (fallbackError) {
-          print('Auch Fallback-Erstellung fehlgeschlagen: $fallbackError');
+          // Fehler stillschweigend ignorieren für Produktionsumgebung
           return null;
         }
       }

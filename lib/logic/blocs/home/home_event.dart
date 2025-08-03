@@ -55,11 +55,17 @@ class SearchLocationsEvent extends HomeEvent {
   /// Der Suchbegriff, nach dem gefiltert werden soll
   final String query;
   
+  /// Gibt an, ob die Suche explizit ausgelöst wurde (z.B. durch Enter-Taste)
+  /// 
+  /// Bei expliziten Suchen werden einige Optimierungen übersprungen
+  final bool isExplicitSearch;
+  
   /// Erstellt ein neues SearchLocationsEvent
   ///
   /// [query] ist der Suchbegriff, nach dem gesucht werden soll.
+  /// [isExplicitSearch] gibt an, ob die Suche explizit ausgelöst wurde.
   /// Die Suche umfasst Straße, Stadt, Bundesland und Land.
-  SearchLocationsEvent({required this.query});
+  SearchLocationsEvent({required this.query, this.isExplicitSearch = false});
 }
 
 /// Event zum Zurücksetzen der Suche

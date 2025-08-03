@@ -53,6 +53,12 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   /// Zeitpunkt der letzten Aktualisierung der Daten
   DateTime? _lastUpdated;
 
+  /// Getter für alle McDonald's-Daten (ungefiltert)
+  /// 
+  /// Wird hauptsächlich für Statistiken verwendet, um die Gesamtzahl
+  /// aller Standorte zu zeigen, unabhängig von aktuellen Filtern
+  List<McDonaldsLocation> get allLocations => List.unmodifiable(_allMcDonaldsData);
+
   /// Erstellt eine neue Instanz des HomeBloc
   ///
   /// [repository] ist das Repository, das für den Zugriff auf die Daten verwendet wird.
@@ -67,6 +73,9 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
        _internetCubit = internetCubit,
        super(HomeStateInitial()) {
     log("HomeBloc initializing...");
+
+    // FavoritesService initialisieren
+    _initializeFavorites();
 
     // Verbindung mit dem InternetCubit herstellen, um Netzwerkänderungen zu überwachen
     if (_internetCubit != null) {
@@ -101,6 +110,18 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     
     // Event zum Laden von Standorten in einem Kartenbereich
     on<LoadLocationsInViewEvent>(_onLoadLocationsInView);
+  }
+
+  /// Initialisiert den FavoritesService
+  ///
+  /// Diese Methode lädt die Favoriten und führt gegebenenfalls eine Migration durch
+  Future<void> _initializeFavorites() async {
+    try {
+      await _favoritesService.init();
+      log("FavoritesService erfolgreich initialisiert");
+    } catch (e) {
+      log("Fehler bei der FavoritesService-Initialisierung: $e");
+    }
   }
   
   /// Verarbeitet eine Datenanforderung
@@ -304,23 +325,61 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   ///
   /// [event] enthält den Suchbegriff
   /// [emit] wird verwendet, um neue Zustände zu emittieren
+  /// Letzte Suchtext für Optimierung
+  String? _lastSearchQuery;
+  
+  /// Timer für die verzögerte Suche
+  Timer? _searchDebounceTimer;
+
+  /// Verarbeitet eine Suchanfrage
+  ///
+  /// [event] enthält den Suchbegriff
+  /// [emit] wird verwendet, um neue Zustände zu emittieren
+  /// Die Methode implementiert Optimierungen für die Suche:
+  /// - Kein Loading-State für kurze Suchbegriffe
+  /// - Cache für identische Suchanfragen bei nicht-expliziten Suchen
   Future<void> _onSearchLocations(
     SearchLocationsEvent event, 
     Emitter<HomeState> emit
   ) async {
     try {
-      emit(HomeStateLoading());
+      final query = event.query.trim();
       
       // Suche durchführen, nur wenn Suchbegriff nicht leer ist
-      if (event.query.trim().isEmpty) {
+      if (query.isEmpty) {
         add(ResetSearchEvent());
         return;
       }
       
-      final searchResults = await _repository.searchLocations(event.query);
+      // Suchbegriff zu kurz (weniger als 2 Zeichen), keine Suche durchführen
+      if (query.length < 2 && !event.isExplicitSearch) {
+        log("Suchbegriff zu kurz: $query");
+        return;
+      }
+      
+      // Bei normaler Suche: Überprüfen, ob es sich um die gleiche Suchanfrage handelt
+      if (!event.isExplicitSearch && query == _lastSearchQuery) {
+        log("Suche übersprungen (identischer Suchbegriff): $query");
+        return;
+      }
+      
+      // Bei expliziter Suche oder neuem Suchbegriff den Suchbegriff merken
+      _lastSearchQuery = query;
+      
+      // Nur während längerer Suchen einen Loading-State anzeigen und nur wenn nicht explizit gesucht wird
+      if (query.length > 3 && !event.isExplicitSearch) {
+        emit(HomeStateLoading());
+      }
+      
+      // Suche durchführen
+      log("Suche nach: $query");
+      final searchResults = await _repository.searchLocations(query);
+      log("Suchergebnisse gefunden: ${searchResults.length}");
+      
+      // Ergebnisse in gefilterte Daten speichern
       _filteredMcDonaldsData = searchResults;
       
-      // State aktualisieren
+      // State aktualisieren - auch bei leeren Ergebnissen
       if (_currentPosition != null) {
         final currentState = state is HomeStateLoaded ? state as HomeStateLoaded : null;
         final favoritesList = currentState?.favorites ?? [];
@@ -330,9 +389,9 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
           _currentPosition!,
           filtered: true, // Die Ergebnisse sind durch die Suche gefiltert
           showOnlyBroken: _filterOnlyBroken,
-          showOnlyWorking: null,
+          showOnlyWorking: _filterOnlyWorking,
           lastUpdated: _lastUpdated,
-          searchQuery: event.query,
+          searchQuery: query,
           favorites: favoritesList,
         ));
       } else {
@@ -343,15 +402,47 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
           _filteredMcDonaldsData,
           filtered: true, // Die Ergebnisse sind durch die Suche gefiltert
           showOnlyBroken: _filterOnlyBroken,
-          showOnlyWorking: null,
+          showOnlyWorking: _filterOnlyWorking,
           lastUpdated: _lastUpdated,
-          searchQuery: event.query,
+          searchQuery: query,
           favorites: favoritesList,
         ));
       }
     } catch (e) {
       log("Fehler bei der Suche: $e");
-      emit(HomeStateError("Suche fehlgeschlagen: $e"));
+      
+      // Bei Suchfehlern den vorherigen Zustand wiederherstellen
+      // anstatt im Loading-State hängen zu bleiben
+      _applyFiltering();
+      
+      if (_currentPosition != null) {
+        final currentState = state is HomeStateLoaded ? state as HomeStateLoaded : null;
+        final favoritesList = currentState?.favorites ?? [];
+        
+        emit(HomeStateLoaded(
+          _filteredMcDonaldsData, 
+          _currentPosition!,
+          filtered: _filterOnlyBroken != null || _filterOnlyWorking != null,
+          showOnlyBroken: _filterOnlyBroken,
+          showOnlyWorking: _filterOnlyWorking,
+          lastUpdated: _lastUpdated,
+          searchQuery: null, // Suchbegriff zurücksetzen bei Fehler
+          favorites: favoritesList,
+        ));
+      } else {
+        final currentState = state is HomeStateNoLocation ? state as HomeStateNoLocation : null;
+        final favoritesList = currentState?.favorites ?? [];
+        
+        emit(HomeStateNoLocation(
+          _filteredMcDonaldsData,
+          filtered: _filterOnlyBroken != null || _filterOnlyWorking != null,
+          showOnlyBroken: _filterOnlyBroken,
+          showOnlyWorking: _filterOnlyWorking,
+          lastUpdated: _lastUpdated,
+          searchQuery: null, // Suchbegriff zurücksetzen bei Fehler
+          favorites: favoritesList,
+        ));
+      }
     }
   }
   
@@ -499,13 +590,41 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     Emitter<HomeState> emit
   ) async {
     try {
+      log("Suche zurücksetzen");
+      
+      // Suchtext zurücksetzen
+      _lastSearchQuery = null;
+      
+      // Filter anwenden, um die richtigen Daten anzuzeigen
+      _applyFiltering(onlyWorking: _filterOnlyWorking);
+      
+      // Zustand aktualisieren je nach aktuellem Zustand
       if (state is HomeStateLoaded) {
         final currentState = state as HomeStateLoaded;
-
-        // Filter aufheben und alle Daten anzeigen
-        emit(currentState.copyWith(
-          mcdonalds_data: _allMcDonaldsData, 
-          searchQuery: null,
+        
+        // Aktuellen Zustand beibehalten, aber Suchbegriff entfernen und gefilterte Daten zurücksetzen
+        emit(HomeStateLoaded(
+          _filteredMcDonaldsData,
+          currentState.position,
+          filtered: _filterOnlyBroken != null || _filterOnlyWorking != null,
+          showOnlyBroken: _filterOnlyBroken,
+          showOnlyWorking: _filterOnlyWorking,
+          lastUpdated: _lastUpdated,
+          searchQuery: null, // Suchbegriff zurücksetzen
+          favorites: currentState.favorites,
+        ));
+      } else if (state is HomeStateNoLocation) {
+        final currentState = state as HomeStateNoLocation;
+        
+        // Aktuellen Zustand beibehalten, aber Suchbegriff entfernen und gefilterte Daten zurücksetzen
+        emit(HomeStateNoLocation(
+          _filteredMcDonaldsData,
+          filtered: _filterOnlyBroken != null || _filterOnlyWorking != null,
+          showOnlyBroken: _filterOnlyBroken,
+          showOnlyWorking: _filterOnlyWorking,
+          lastUpdated: _lastUpdated,
+          searchQuery: null, // Suchbegriff zurücksetzen
+          favorites: currentState.favorites,
         ));
       }
     } catch (e) {
@@ -641,6 +760,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   @override
   Future<void> close() {
     _internetStreamSubscription?.cancel();
+    _searchDebounceTimer?.cancel();
     return super.close();
   }
 }

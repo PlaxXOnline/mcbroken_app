@@ -4,11 +4,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mcbroken/constants/enums.dart';
+import 'package:mcbroken/l10n/app_localizations.dart';
 import 'package:mcbroken/logic/blocs/home/home_bloc.dart';
 import 'package:mcbroken/logic/cubits/connectivity/internet_cubit.dart';
 import 'package:mcbroken/presentation/screens/settings_screen.dart';
 import 'package:mcbroken/presentation/widgets/map.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 /// Hauptbildschirm der Anwendung
 ///
@@ -25,187 +25,12 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  /// Controller für das Suchfeld
-  final TextEditingController _searchController = TextEditingController();
-
-  /// Baut die Suchleiste für die Ortssuche
-  Widget _buildSearchBar(BuildContext context, AppLocalizations locale) {
-    final homeBloc = context.read<HomeBloc>();
-    
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-      child: Row(
-        children: [
-          // Suchfeld mit Autocomplete
-          Expanded(
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(24.0),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey.withOpacity(0.2),
-                    spreadRadius: 1,
-                    blurRadius: 2,
-                    offset: const Offset(0, 1),
-                  ),
-                ],
-              ),
-              child: TextField(
-                controller: _searchController,
-                decoration: InputDecoration(
-                  hintText: locale.searchHint,
-                  prefixIcon: const Icon(Icons.search),
-                  suffixIcon: _searchController.text.isNotEmpty
-                      ? IconButton(
-                          icon: const Icon(Icons.clear),
-                          onPressed: () {
-                            _searchController.clear();
-                            homeBloc.add(ResetSearchEvent());
-                          },
-                        )
-                      : null,
-                  border: InputBorder.none,
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 16.0),
-                ),
-                onChanged: (value) {
-                  // Aktualisieren der UI, um den Clear-Button anzuzeigen
-                  setState(() {});
-                },
-                onSubmitted: (value) {
-                  if (value.isNotEmpty) {
-                    homeBloc.add(SearchLocationsEvent(query: value));
-                  } else {
-                    homeBloc.add(ResetSearchEvent());
-                  }
-                },
-              ),
-            ),
-          ),
-          
-          // Filteroptionen
-          IconButton(
-            icon: const Icon(Icons.filter_list),
-            onPressed: () {
-              _showFilterDialog(context, locale);
-            },
-          ),
-        ],
-      ),
-    );
-  }
-  
-  /// Zeigt einen Dialog mit Filteroptionen an
-  Future<void> _showFilterDialog(BuildContext context, AppLocalizations locale) async {
-    return showDialog<void>(
-      context: context,
-      builder: (BuildContext context) {
-        final homeBloc = context.read<HomeBloc>();
-        final currentState = homeBloc.state;
-        
-        bool? showOnlyBroken;
-        bool? showOnlyWorking;
-        
-        if (currentState is HomeStateLoaded) {
-          showOnlyBroken = currentState.showOnlyBroken;
-          showOnlyWorking = currentState.showOnlyWorking;
-        } else if (currentState is HomeStateNoLocation) {
-          showOnlyBroken = currentState.showOnlyBroken;
-          showOnlyWorking = currentState.showOnlyWorking;
-        }
-        
-        bool onlyFavorites = false;
-        
-        return StatefulBuilder(
-          builder: (context, setState) {
-            return AlertDialog(
-              title: Text(locale.filterTitle),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  ListTile(
-                    title: Text(locale.showAll),
-                    leading: Radio<bool?>(
-                      value: null,
-                      groupValue: showOnlyBroken == null && showOnlyWorking == null ? null : false,
-                      onChanged: (value) {
-                        setState(() {
-                          showOnlyBroken = null;
-                          showOnlyWorking = null;
-                        });
-                      },
-                    ),
-                  ),
-                  ListTile(
-                    title: Text(locale.showOnlyDefect),
-                    leading: Radio<bool?>(
-                      value: true,
-                      groupValue: showOnlyBroken,
-                      onChanged: (value) {
-                        setState(() {
-                          showOnlyBroken = value;
-                          showOnlyWorking = null;
-                        });
-                      },
-                    ),
-                  ),
-                  ListTile(
-                    title: Text(locale.showOnlyWorking),
-                    leading: Radio<bool?>(
-                      value: true,
-                      groupValue: showOnlyWorking,
-                      onChanged: (value) {
-                        setState(() {
-                          showOnlyWorking = value;
-                          showOnlyBroken = null;
-                        });
-                      },
-                    ),
-                  ),
-                  const Divider(),
-                  ListTile(
-                    title: Text(locale.favorites),
-                    leading: Checkbox(
-                      value: onlyFavorites,
-                      onChanged: (value) {
-                        setState(() {
-                          onlyFavorites = value ?? false;
-                        });
-                      },
-                    ),
-                  ),
-                ],
-              ),
-              actions: <Widget>[
-                TextButton(
-                  child: Text(locale.cancel),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                ),
-                TextButton(
-                  child: Text(locale.apply),
-                  onPressed: () {
-                    homeBloc.add(FilterLocationsEvent(
-                      onlyBroken: showOnlyBroken,
-                      onlyWorking: showOnlyWorking,
-                      onlyFavorites: onlyFavorites,
-                    ));
-                    Navigator.of(context).pop();
-                  },
-                ),
-              ],
-            );
-          },
-        );
-      },
-    );
-  }
+  // Die Suchleiste und der Filter-Dialog wurden in die Map-Widget-Klasse verschoben,
+  // um die UX zu verbessern und unnötige Neuaufbauten des kompletten Screens zu vermeiden
 
   @override
   void dispose() {
-    _searchController.dispose();
+    // Keine Controller mehr zu entsorgen
     super.dispose();
   }
 
@@ -237,10 +62,6 @@ class _HomeScreenState extends State<HomeScreen> {
         title: Text(
           locale.appTitle,
           style: GoogleFonts.courgette(),
-        ),
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(56.0),
-          child: _buildSearchBar(context, locale),
         ),
         centerTitle: true,
       ),
@@ -287,6 +108,60 @@ class _HomeScreenState extends State<HomeScreen> {
                               const Expanded(child: McDonaldsMap()),
                             ],
                           );
+                        } else if (homeState is HomeStateLoaded || homeState is HomeStateNoLocation) {
+                          // Für geladene Zustände prüfen, ob Suchergebnisse leer sind und ein Suchbegriff vorhanden ist
+                          final bool hasSearchQuery = (homeState as dynamic).searchQuery != null;
+                          final bool hasNoResults = (homeState as dynamic).mcdonalds_data.isEmpty;
+                          
+                          if (hasSearchQuery && hasNoResults) {
+                            // Karte anzeigen, aber mit Overlay für "Keine Ergebnisse"
+                            return Stack(
+                              children: [
+                                const McDonaldsMap(),
+                                // Transparentes Overlay mit Meldung für keine Ergebnisse
+                                Positioned.fill(
+                                  child: Container(
+                                    color: Colors.black.withOpacity(0.5),
+                                    child: Center(
+                                      child: Card(
+                                        color: Colors.white,
+                                        elevation: 8,
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(16.0),
+                                          child: Column(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              const Icon(
+                                                Icons.search_off,
+                                                size: 48,
+                                                color: Colors.orange,
+                                              ),
+                                              const SizedBox(height: 16),
+                                              Text(
+                                                locale.noSearchResults,
+                                                style: Theme.of(context).textTheme.titleMedium,
+                                                textAlign: TextAlign.center,
+                                              ),
+                                              const SizedBox(height: 8),
+                                              TextButton(
+                                                onPressed: () {
+                                                  context.read<HomeBloc>().add(ResetSearchEvent());
+                                                },
+                                                child: Text(locale.resetSearch),
+                                              )
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                )
+                              ],
+                            );
+                          }
+                          
+                          // Normale Kartendarstellung
+                          return const McDonaldsMap();
                         } else if (homeState is HomeStateError) {
                           // Bei Fehlern
                           return Center(

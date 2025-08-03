@@ -23,6 +23,8 @@
   "addToFavorites": "Zu Favoriten hinzufügen",
   "removeFromFavorites": "Aus Favoriten entfernen",
   "noResults": "Keine Ergebnisse gefunden",
+  "noSearchResults": "Keine Suchergebnisse für deine Anfrage gefunden",
+  "resetSearch": "Suche zurücksetzen",
   "apply": "Anwenden",
   "cancel": "Abbrechen"
 }

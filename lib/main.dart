@@ -4,12 +4,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:mcbroken/constants/bloc_observer.dart';
 import 'package:mcbroken/core/di/injection_container.dart';
+import 'package:mcbroken/l10n/app_localizations.dart';
 import 'package:mcbroken/logic/blocs/home/home_bloc.dart';
 import 'package:mcbroken/logic/cubits/connectivity/internet_cubit.dart';
 import 'package:mcbroken/logic/cubits/settings/settings_cubit.dart';
 import 'package:mcbroken/presentation/screens/home_screen.dart';
 import 'package:mcbroken/services/background_service.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 /// Haupteinstiegspunkt der Anwendung

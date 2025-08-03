@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mcbroken/data/models/mcdonalds_location.dart';
+import 'package:mcbroken/l10n/app_localizations.dart';
 import 'package:mcbroken/logic/blocs/home/home_bloc.dart';
 import 'package:mcbroken/logic/cubits/settings/settings_cubit.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:settings_ui/settings_ui.dart';
 
 /// Einstellungsbildschirm der Anwendung
@@ -48,28 +48,11 @@ class SettingsScreen extends StatelessWidget {
   /// Gibt ein Widget zurück, das die Einstellungsliste darstellt
   Widget buildSettingsList(
       BuildContext context, SettingsState state, AppLocalizations locale) {
-    final Size size = MediaQuery.of(context).size;
-    
-    // Statistikdaten über McDonald's-Standorte abrufen
-    List<McDonaldsLocation> allLocations = [];
-    List<McDonaldsLocation> workingList = [];
-    List<McDonaldsLocation> notWorkingList = [];
-    
-    // Daten aus dem aktuellen HomeBloc-Zustand extrahieren
-    final homeState = context.watch<HomeBloc>().state;
-    if (homeState is HomeStateLoaded) {
-      allLocations = homeState.mcdonalds_data;
-      workingList = allLocations.where((location) => !location.properties.isBroken).toList();
-      notWorkingList = allLocations.where((location) => location.properties.isBroken).toList();
-    } else if (homeState is HomeStateNoLocation) {
-      allLocations = homeState.mcdonalds_data;
-      workingList = allLocations.where((location) => !location.properties.isBroken).toList();
-      notWorkingList = allLocations.where((location) => location.properties.isBroken).toList();
-    } else if (homeState is HomeStateOffline) {
-      allLocations = homeState.locations;
-      workingList = allLocations.where((location) => !location.properties.isBroken).toList();
-      notWorkingList = allLocations.where((location) => location.properties.isBroken).toList();
-    }
+    // Statistikdaten über McDonald's-Standorte abrufen - IMMER alle Daten für Statistiken verwenden
+    final homeBloc = context.watch<HomeBloc>();
+    final List<McDonaldsLocation> allLocations = homeBloc.allLocations;
+    final List<McDonaldsLocation> workingList = allLocations.where((location) => !location.properties.isBroken).toList();
+    final List<McDonaldsLocation> notWorkingList = allLocations.where((location) => location.properties.isBroken).toList();
 
     return BlocBuilder<SettingsCubit, SettingsState>(
       buildWhen: (old, next) => old != next,
